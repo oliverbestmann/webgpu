@@ -1,4 +1,4 @@
-//go:build (linux || freebsd || netbsd || openbsd) && !android && !x11 && wayland
+//go:build (linux || freebsd || netbsd || openbsd) && !android && ((!x11 && !wayland) || wayland)
 
 package wgpuglfw
 
