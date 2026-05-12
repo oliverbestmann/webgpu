@@ -21,6 +21,6 @@ func GetSurfaceDescriptor(w *glfw.Window) *wgpu.SurfaceDescriptor {
 		}
 
 	default:
-		panic("Unsupported glfw platform. To support both x11 and wayland, build with --tags wayland,x11")
+		panic("Unsupported glfw platform. Build with no tags to support both x11 and wayland.")
 	}
 }
