@@ -129,7 +129,8 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 	var desc *C.WGPUDeviceDescriptor = nil
 
 	if descriptor != nil {
-		desc = &C.WGPUDeviceDescriptor{}
+		desc = (*C.WGPUDeviceDescriptor)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPUDeviceDescriptor{}))))
+		defer C.free(unsafe.Pointer(desc))
 
 		if descriptor.Label != "" {
 			label := C.CString(descriptor.Label)
