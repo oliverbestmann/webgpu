@@ -39,10 +39,9 @@ func (p *Queue) Submit(commands ...*CommandBuffer) (submissionIndex SubmissionIn
 		return SubmissionIndex(r)
 	}
 
-	commandRefs := C.calloc(C.size_t(commandCount), C.size_t(unsafe.Sizeof(C.WGPUCommandBuffer(nil))))
-	defer C.free(commandRefs)
+	commandRefs, commandRefsSlice := callocSlice[C.WGPUCommandBuffer](commandCount)
+	defer free(commandRefs)
 
-	commandRefsSlice := unsafe.Slice((*C.WGPUCommandBuffer)(commandRefs), commandCount)
 	for i, v := range commands {
 		commandRefsSlice[i] = v.ref
 	}
@@ -50,7 +49,7 @@ func (p *Queue) Submit(commands ...*CommandBuffer) (submissionIndex SubmissionIn
 	r := C.wgpuQueueSubmitForIndex(
 		p.ref,
 		C.size_t(commandCount),
-		(*C.WGPUCommandBuffer)(commandRefs),
+		commandRefs,
 	)
 	return SubmissionIndex(r)
 }

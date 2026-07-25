@@ -20,12 +20,12 @@ import (
 func (g *Adapter) GetFeatures() []FeatureName {
 	var supportedFeatures C.WGPUSupportedFeatures
 	C.wgpuAdapterGetFeatures(g.ref, (*C.WGPUSupportedFeatures)(unsafe.Pointer(&supportedFeatures)))
-	defer C.free(unsafe.Pointer(supportedFeatures.features))
+	defer free(supportedFeatures.features)
 
 	features := make([]FeatureName, supportedFeatures.featureCount)
 
 	for i := range int(supportedFeatures.featureCount) {
-		offset := uintptr(i) * unsafe.Sizeof(C.WGPUFeatureName(0))
+		offset := uintptr(i) * sizeOf[C.WGPUFeatureName]()
 		features[i] = FeatureName(*(*C.WGPUFeatureName)(unsafe.Pointer(uintptr(unsafe.Pointer(supportedFeatures.features)) + offset)))
 	}
 
@@ -35,8 +35,8 @@ func (g *Adapter) GetFeatures() []FeatureName {
 func (g *Adapter) GetLimits() Limits {
 	var limits C.WGPULimits
 
-	nativeLimits := (*C.WGPUNativeLimits)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPUNativeLimits{}))))
-	defer C.free(unsafe.Pointer(nativeLimits))
+	nativeLimits := callocOne[C.WGPUNativeLimits]()
+	defer free(nativeLimits)
 	limits.nextInChain = (*C.WGPUChainedStruct)(unsafe.Pointer(nativeLimits))
 
 	C.wgpuAdapterGetLimits(g.ref, &limits)
@@ -133,7 +133,7 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 
 		if descriptor.Label != "" {
 			label := C.CString(descriptor.Label)
-			defer C.free(unsafe.Pointer(label))
+			defer free(label)
 
 			desc.label.data = label
 			desc.label.length = C.WGPU_STRLEN
@@ -141,21 +141,22 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 
 		requiredFeatureCount := len(descriptor.RequiredFeatures)
 		if requiredFeatureCount != 0 {
-			requiredFeatures := C.calloc(C.size_t(requiredFeatureCount), C.size_t(unsafe.Sizeof(C.WGPUFeatureName(0))))
-			defer C.free(requiredFeatures)
+			requiredFeatures, requiredFeaturesSlice := callocSlice[C.WGPUFeatureName](requiredFeatureCount)
+			defer free(requiredFeatures)
 
-			requiredFeaturesSlice := unsafe.Slice((*FeatureName)(requiredFeatures), requiredFeatureCount)
-			copy(requiredFeaturesSlice, descriptor.RequiredFeatures)
+			for idx, feature := range descriptor.RequiredFeatures {
+				requiredFeaturesSlice[idx] = C.WGPUFeatureName(feature)
+			}
 
-			desc.requiredFeatures = (*C.WGPUFeatureName)(requiredFeatures)
+			desc.requiredFeatures = requiredFeatures
 			desc.requiredFeatureCount = C.size_t(requiredFeatureCount)
 		}
 
 		if descriptor.RequiredLimits != nil {
 			l := descriptor.RequiredLimits
 
-			requiredLimits := (*C.WGPULimits)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPULimits{}))))
-			defer C.free(unsafe.Pointer(requiredLimits))
+			requiredLimits := callocOne[C.WGPULimits]()
+			defer free(requiredLimits)
 
 			*requiredLimits = C.WGPULimits{
 				maxTextureDimension1D:                     C.uint32_t(l.MaxTextureDimension1D),
@@ -191,8 +192,8 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 			}
 			desc.requiredLimits = requiredLimits
 
-			nativeLimits := (*C.WGPUNativeLimits)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPUNativeLimits{}))))
-			defer C.free(unsafe.Pointer(nativeLimits))
+			nativeLimits := callocOne[C.WGPUNativeLimits]()
+			defer free(nativeLimits)
 
 			nativeLimits.chain.next = nil
 			nativeLimits.chain.sType = C.WGPUSType_NativeLimits
@@ -211,14 +212,14 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 		}
 
 		if descriptor.TracePath != "" {
-			deviceExtras := (*C.WGPUDeviceExtras)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPUDeviceExtras{}))))
-			defer C.free(unsafe.Pointer(deviceExtras))
+			deviceExtras := callocOne[C.WGPUDeviceExtras]()
+			defer free(deviceExtras)
 
 			deviceExtras.chain.next = nil
 			deviceExtras.chain.sType = C.WGPUSType_DeviceExtras
 
 			tracePath := C.CString(descriptor.TracePath)
-			defer C.free(unsafe.Pointer(tracePath))
+			defer free(tracePath)
 
 			deviceExtras.tracePath.data = tracePath
 			deviceExtras.tracePath.length = C.WGPU_STRLEN

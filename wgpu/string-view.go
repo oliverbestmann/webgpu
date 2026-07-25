@@ -2,7 +2,6 @@ package wgpu
 
 // #include "gen_wgpu_wrappers.h"
 import "C"
-import "unsafe"
 
 type stringView struct {
 	view C.WGPUStringView
@@ -27,6 +26,6 @@ func (v stringView) ToC() C.WGPUStringView {
 
 func (v stringView) Release() {
 	if v.view.data != nil {
-		C.free(unsafe.Pointer(v.view.data))
+		free(v.view.data)
 	}
 }

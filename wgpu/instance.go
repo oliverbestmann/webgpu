@@ -20,8 +20,8 @@ func CreateInstance(descriptor *InstanceDescriptor) *Instance {
 	var desc C.WGPUInstanceDescriptor
 
 	if descriptor != nil {
-		instanceExtras := (*C.WGPUInstanceExtras)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPUInstanceExtras{}))))
-		defer C.free(unsafe.Pointer(instanceExtras))
+		instanceExtras := callocOne[C.WGPUInstanceExtras]()
+		defer free(instanceExtras)
 
 		instanceExtras.chain.next = nil
 		instanceExtras.chain.sType = C.WGPUSType_InstanceExtras
@@ -30,7 +30,7 @@ func CreateInstance(descriptor *InstanceDescriptor) *Instance {
 
 		if descriptor.DxcPath != "" {
 			dxcPath := C.CString(descriptor.DxcPath)
-			defer C.free(unsafe.Pointer(dxcPath))
+			defer free(dxcPath)
 
 			instanceExtras.dxcPath.data = dxcPath
 			instanceExtras.dxcPath.length = C.WGPU_STRLEN
@@ -92,15 +92,15 @@ func (g *Instance) CreateSurface(descriptor *SurfaceDescriptor) *Surface {
 	if descriptor != nil {
 		if descriptor.Label != "" {
 			label := C.CString(descriptor.Label)
-			defer C.free(unsafe.Pointer(label))
+			defer free(label)
 
 			desc.label.data = label
 			desc.label.length = C.WGPU_STRLEN
 		}
 
 		if descriptor.WindowsHWND != nil {
-			windowsHWND := (*C.WGPUSurfaceSourceWindowsHWND)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPUSurfaceSourceWindowsHWND{}))))
-			defer C.free(unsafe.Pointer(windowsHWND))
+			windowsHWND := callocOne[C.WGPUSurfaceSourceWindowsHWND]()
+			defer free(windowsHWND)
 
 			windowsHWND.chain.next = nil
 			windowsHWND.chain.sType = C.WGPUSType_SurfaceSourceWindowsHWND
@@ -111,8 +111,8 @@ func (g *Instance) CreateSurface(descriptor *SurfaceDescriptor) *Surface {
 		}
 
 		if descriptor.XcbWindow != nil {
-			xcbWindow := (*C.WGPUSurfaceSourceXCBWindow)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPUSurfaceSourceXCBWindow{}))))
-			defer C.free(unsafe.Pointer(xcbWindow))
+			xcbWindow := callocOne[C.WGPUSurfaceSourceXCBWindow]()
+			defer free(xcbWindow)
 
 			xcbWindow.chain.next = nil
 			xcbWindow.chain.sType = C.WGPUSType_SurfaceSourceXCBWindow
@@ -123,8 +123,8 @@ func (g *Instance) CreateSurface(descriptor *SurfaceDescriptor) *Surface {
 		}
 
 		if descriptor.XlibWindow != nil {
-			xlibWindow := (*C.WGPUSurfaceSourceXlibWindow)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPUSurfaceSourceXlibWindow{}))))
-			defer C.free(unsafe.Pointer(xlibWindow))
+			xlibWindow := callocOne[C.WGPUSurfaceSourceXlibWindow]()
+			defer free(xlibWindow)
 
 			xlibWindow.chain.next = nil
 			xlibWindow.chain.sType = C.WGPUSType_SurfaceSourceXlibWindow
@@ -135,8 +135,8 @@ func (g *Instance) CreateSurface(descriptor *SurfaceDescriptor) *Surface {
 		}
 
 		if descriptor.MetalLayer != nil {
-			metalLayer := (*C.WGPUSurfaceSourceMetalLayer)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPUSurfaceSourceMetalLayer{}))))
-			defer C.free(unsafe.Pointer(metalLayer))
+			metalLayer := callocOne[C.WGPUSurfaceSourceMetalLayer]()
+			defer free(metalLayer)
 
 			metalLayer.chain.next = nil
 			metalLayer.chain.sType = C.WGPUSType_SurfaceSourceMetalLayer
@@ -146,8 +146,8 @@ func (g *Instance) CreateSurface(descriptor *SurfaceDescriptor) *Surface {
 		}
 
 		if descriptor.WaylandSurface != nil {
-			waylandSurface := (*C.WGPUSurfaceSourceWaylandSurface)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPUSurfaceSourceWaylandSurface{}))))
-			defer C.free(unsafe.Pointer(waylandSurface))
+			waylandSurface := callocOne[C.WGPUSurfaceSourceWaylandSurface]()
+			defer free(waylandSurface)
 
 			waylandSurface.chain.next = nil
 			waylandSurface.chain.sType = C.WGPUSType_SurfaceSourceWaylandSurface
@@ -158,8 +158,8 @@ func (g *Instance) CreateSurface(descriptor *SurfaceDescriptor) *Surface {
 		}
 
 		if descriptor.AndroidNativeWindow != nil {
-			androidNativeWindow := (*C.WGPUSurfaceSourceAndroidNativeWindow)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPUSurfaceSourceAndroidNativeWindow{}))))
-			defer C.free(unsafe.Pointer(androidNativeWindow))
+			androidNativeWindow := callocOne[C.WGPUSurfaceSourceAndroidNativeWindow]()
+			defer free(androidNativeWindow)
 
 			androidNativeWindow.chain.next = nil
 			androidNativeWindow.chain.sType = C.WGPUSType_SurfaceSourceAndroidNativeWindow

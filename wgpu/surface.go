@@ -21,16 +21,22 @@ func (g *Surface) GetCapabilities(adapter *Adapter) (ret SurfaceCapabilities) {
 		return
 	}
 	if caps.formatCount > 0 {
-		caps.formats = (*C.WGPUTextureFormat)(C.calloc(C.size_t(unsafe.Sizeof(C.WGPUTextureFormat(0))), caps.formatCount))
-		defer C.free(unsafe.Pointer(caps.formats))
+		formats, formatsSlice := callocSlice[C.WGPUTextureFormat](int(caps.formatCount))
+		defer free(formats)
+		caps.formats = formats
+		_ = formatsSlice
 	}
 	if caps.presentModeCount > 0 {
-		caps.presentModes = (*C.WGPUPresentMode)(C.calloc(C.size_t(unsafe.Sizeof(C.WGPUPresentMode(0))), caps.presentModeCount))
-		defer C.free(unsafe.Pointer(caps.presentModes))
+		presentModes, presentModesSlice := callocSlice[C.WGPUPresentMode](int(caps.presentModeCount))
+		defer free(presentModes)
+		caps.presentModes = presentModes
+		_ = presentModesSlice
 	}
 	if caps.alphaModeCount > 0 {
-		caps.alphaModes = (*C.WGPUCompositeAlphaMode)(C.calloc(C.size_t(unsafe.Sizeof(C.WGPUCompositeAlphaMode(0))), caps.alphaModeCount))
-		defer C.free(unsafe.Pointer(caps.alphaModes))
+		alphaModes, alphaModesSlice := callocSlice[C.WGPUCompositeAlphaMode](int(caps.alphaModeCount))
+		defer free(alphaModes)
+		caps.alphaModes = alphaModes
+		_ = alphaModesSlice
 	}
 
 	C.wgpuSurfaceGetCapabilities(g.ref, adapter.ref, &caps)

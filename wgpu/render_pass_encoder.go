@@ -78,20 +78,19 @@ func (p *RenderPassEncoder) ExecuteBundles(bundles ...*RenderBundle) {
 		return
 	}
 
-	bundlesPtr := C.calloc(C.size_t(bundlesCount), C.size_t(unsafe.Sizeof(C.WGPURenderBundle(nil))))
-	defer C.free(bundlesPtr)
+	bundlesPtr, bundlesSlice := callocSlice[C.WGPURenderBundle](bundlesCount)
+	defer free(bundlesPtr)
 
-	bundlesSlice := unsafe.Slice((*C.WGPURenderBundle)(bundlesPtr), bundlesCount)
 	for i, v := range bundles {
 		bundlesSlice[i] = v.ref
 	}
 
-	C.wgpuRenderPassEncoderExecuteBundles(p.ref, C.size_t(bundlesCount), (*C.WGPURenderBundle)(bundlesPtr))
+	C.wgpuRenderPassEncoderExecuteBundles(p.ref, C.size_t(bundlesCount), bundlesPtr)
 }
 
 func (p *RenderPassEncoder) InsertDebugMarker(markerLabel string) {
 	markerLabelStr := C.CString(markerLabel)
-	defer C.free(unsafe.Pointer(markerLabelStr))
+	defer free(markerLabelStr)
 
 	C.wgpuRenderPassEncoderInsertDebugMarker(p.ref, C.WGPUStringView{
 		data:   markerLabelStr,
@@ -105,7 +104,7 @@ func (p *RenderPassEncoder) PopDebugGroup() {
 
 func (p *RenderPassEncoder) PushDebugGroup(groupLabel string) {
 	groupLabelStr := C.CString(groupLabel)
-	defer C.free(unsafe.Pointer(groupLabelStr))
+	defer free(groupLabelStr)
 
 	C.wgpuRenderPassEncoderPushDebugGroup(p.ref, C.WGPUStringView{
 		data:   groupLabelStr,
