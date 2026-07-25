@@ -26,9 +26,9 @@ void gowebgpu_device_lost_callback_c(WGPUDeviceLostReason reason, char const * m
   gowebgpu_device_lost_callback_go(reason, message, userdata);
 }
 
-void gowebgpu_queue_work_done_callback_c(WGPUQueueWorkDoneStatus status, void * userdata) {
-  extern void gowebgpu_queue_work_done_callback_go(WGPUQueueWorkDoneStatus status, void * userdata);
-  gowebgpu_queue_work_done_callback_go(status, userdata);
+void gowebgpu_queue_work_done_callback_c(WGPUQueueWorkDoneStatus status, WGPUStringView message, void * userdata) {
+  extern void gowebgpu_queue_work_done_callback_go(WGPUQueueWorkDoneStatus status, WGPUStringView message, void * userdata);
+  gowebgpu_queue_work_done_callback_go(status, message, userdata);
 }
 
 */

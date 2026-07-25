@@ -95,6 +95,9 @@ func (g *TextureDescriptor) toJS() any {
 		"format":        enumToJS(g.Format),
 		"mipLevelCount": g.MipLevelCount,
 		"sampleCount":   g.SampleCount,
+		"viewFormats": mapSlice(g.ViewFormats, func(f TextureFormat) any {
+			return enumToJS(f)
+		}),
 	}
 }
 

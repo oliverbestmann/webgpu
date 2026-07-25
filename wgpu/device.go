@@ -882,6 +882,21 @@ func (g *Device) TryCreateTexture(descriptor *TextureDescriptor) (*Texture, erro
 			sampleCount:   C.uint32_t(descriptor.SampleCount),
 		}
 
+		if len(descriptor.ViewFormats) > 0 {
+			viewsCount := len(descriptor.ViewFormats)
+
+			entries := calloc[C.WGPUTextureFormat](viewsCount)
+			defer free(entries)
+
+			formatsSlice := unsafe.Slice((*C.WGPUTextureFormat)(entries), viewsCount)
+			for idx, format := range descriptor.ViewFormats {
+				formatsSlice[idx] = C.WGPUTextureFormat(format)
+			}
+
+			desc.viewFormats = entries
+			desc.viewFormatCount = C.size_t(viewsCount)
+		}
+
 		if descriptor.Label != "" {
 			label := C.CString(descriptor.Label)
 			defer C.free(unsafe.Pointer(label))

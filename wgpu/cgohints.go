@@ -149,8 +149,6 @@ package wgpu
 #cgo nocallback wgpuQuerySetRelease
 #cgo noescape wgpuQueueRelease
 #cgo nocallback wgpuQueueRelease
-#cgo noescape wgpuQueueSubmitForIndex
-#cgo nocallback wgpuQueueSubmitForIndex
 #cgo noescape wgpuRenderBundleEncoderDraw
 #cgo nocallback wgpuRenderBundleEncoderDraw
 #cgo noescape wgpuRenderBundleEncoderDrawIndexed

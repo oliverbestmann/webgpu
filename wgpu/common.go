@@ -159,6 +159,7 @@ type TextureDescriptor struct {
 	Format        TextureFormat
 	MipLevelCount uint32
 	SampleCount   uint32
+	ViewFormats   []TextureFormat
 }
 
 // BufferDescriptor as described:

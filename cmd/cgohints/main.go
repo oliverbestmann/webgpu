@@ -86,7 +86,7 @@ func generateHints() string {
 			continue
 		}
 
-		if fnWGPU == "wgpuDevicePoll" || fnWGPU == "wgpuQueueSubmit" {
+		if fnWGPU == "wgpuDevicePoll" || fnWGPU == "wgpuQueueSubmit" || fnWGPU == "wgpuQueueSubmitForIndex" {
 			// if i understood correctly,
 			// those methods can run previously scheduled callbacks
 			continue
