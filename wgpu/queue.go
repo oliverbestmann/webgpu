@@ -22,6 +22,13 @@ func gowebgpu_queue_work_done_callback_go(status C.WGPUQueueWorkDoneStatus, mess
 	}
 }
 
+// GetTimestampPeriod returns the number of nanoseconds a timestamp query tick
+// represents. Multiply the difference between two resolved timestamps by it to
+// get a duration in nanoseconds.
+func (p *Queue) GetTimestampPeriod() float32 {
+	return float32(C.wgpuQueueGetTimestampPeriod(p.ref))
+}
+
 func (p *Queue) OnSubmittedWorkDone(callback QueueWorkDoneCallback) {
 	handle := newHandle(callback)
 

@@ -9,10 +9,19 @@ import (
 )
 
 type ComputePassDescriptor struct {
-	Label string
+	Label           string
+	TimestampWrites *PassTimestampWrites
+}
 
-	// unused in wgpu
-	// TimestampWrites []ComputePassTimestampWrite
+func cPassTimestampWrites(w *PassTimestampWrites) (*C.WGPUPassTimestampWrites, func()) {
+	if w == nil || w.QuerySet == nil {
+		return nil, func() {}
+	}
+	writes := callocOne[C.WGPUPassTimestampWrites]()
+	writes.querySet = w.QuerySet.ref
+	writes.beginningOfPassWriteIndex = C.uint32_t(w.BeginningOfPassWriteIndex)
+	writes.endOfPassWriteIndex = C.uint32_t(w.EndOfPassWriteIndex)
+	return writes, func() { free(writes) }
 }
 
 func (p *CommandEncoder) BeginComputePass(descriptor *ComputePassDescriptor) *ComputePassEncoder {
@@ -22,6 +31,10 @@ func (p *CommandEncoder) BeginComputePass(descriptor *ComputePassDescriptor) *Co
 		label := stringViewOf(descriptor.Label)
 		defer label.Release()
 		desc.label = label.ToC()
+
+		timestampWrites, release := cPassTimestampWrites(descriptor.TimestampWrites)
+		defer release()
+		desc.timestampWrites = timestampWrites
 	}
 
 	ref := C.wgpuCommandEncoderBeginComputePass(p.ref, &desc)
@@ -91,6 +104,10 @@ func (p *CommandEncoder) TryBeginRenderPass(descriptor *RenderPassDescriptor) (*
 
 			desc.depthStencilAttachment = depthStencilAttachment
 		}
+
+		timestampWrites, release := cPassTimestampWrites(descriptor.TimestampWrites)
+		defer release()
+		desc.timestampWrites = timestampWrites
 	}
 
 	errh := acquireErrorCallback()

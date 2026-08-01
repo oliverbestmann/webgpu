@@ -176,12 +176,29 @@ func (g *QuerySetDescriptor) toJS() any {
 	}
 }
 
+func (g *PassTimestampWrites) toJS() any {
+	if g == nil || g.QuerySet == nil {
+		return nil
+	}
+	result := map[string]any{"querySet": g.QuerySet.toJS()}
+	if g.BeginningOfPassWriteIndex != QuerySetIndexUndefined {
+		result["beginningOfPassWriteIndex"] = g.BeginningOfPassWriteIndex
+	}
+	if g.EndOfPassWriteIndex != QuerySetIndexUndefined {
+		result["endOfPassWriteIndex"] = g.EndOfPassWriteIndex
+	}
+	return result
+}
+
 func (g *RenderPassDescriptor) toJS() any {
 	result := make(map[string]any)
 	result["colorAttachments"] = mapSlice(g.ColorAttachments, func(attachment RenderPassColorAttachment) any {
 		return attachment.toJS()
 	})
 	result["depthStencilAttachment"] = pointerToJS(g.DepthStencilAttachment)
+	if writes := g.TimestampWrites.toJS(); writes != nil {
+		result["timestampWrites"] = writes
+	}
 	return result
 }
 

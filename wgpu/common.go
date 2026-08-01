@@ -17,6 +17,7 @@ const (
 	LimitU32Undefined        uint32 = 0xffffffff
 	LimitU64Undefined        uint64 = 0xffffffffffffffff
 	MipLevelCountUndefined          = 0xffffffff
+	QuerySetIndexUndefined   uint32 = 0xffffffff
 	WholeMapSize                    = ^uint(0)
 	WholeSize                       = 0xffffffffffffffff
 )
@@ -188,16 +189,26 @@ type QuerySetDescriptor struct {
 	PipelineStatistics []PipelineStatisticName
 }
 
+// PassTimestampWrites as described:
+// https://gpuweb.github.io/gpuweb/#dictdef-gpurenderpasstimestampwrites
+//
+// Set either write index to QuerySetIndexUndefined to skip that boundary.
+type PassTimestampWrites struct {
+	QuerySet                  *QuerySet
+	BeginningOfPassWriteIndex uint32
+	EndOfPassWriteIndex       uint32
+}
+
 // RenderPassDescriptor as described:
 // https://gpuweb.github.io/gpuweb/#dictdef-gpurenderpassdescriptor
 type RenderPassDescriptor struct {
 	Label                  string
 	ColorAttachments       []RenderPassColorAttachment
 	DepthStencilAttachment *RenderPassDepthStencilAttachment
+	TimestampWrites        *PassTimestampWrites
 
 	// unused in wgpu
 	// 	OcclusionQuerySet      QuerySet
-	// 	TimestampWrites        []RenderPassTimestampWrite
 }
 
 type RenderPassDepthStencilAttachment struct {

@@ -56,6 +56,12 @@ func (g *Queue) OnSubmittedWorkDone(callback QueueWorkDoneCallback) {
 	callback(QueueWorkDoneStatusSuccess)
 }
 
+// GetTimestampPeriod always returns 1: browsers resolve timestamp queries in
+// nanoseconds, so no conversion is needed.
+func (g *Queue) GetTimestampPeriod() float32 {
+	return 1
+}
+
 var queueWriteBuffer js.Value
 var queueWriteTexture js.Value
 
