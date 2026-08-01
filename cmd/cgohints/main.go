@@ -86,9 +86,13 @@ func generateHints() string {
 			continue
 		}
 
-		if fnWGPU == "wgpuDevicePoll" || fnWGPU == "wgpuQueueSubmit" || fnWGPU == "wgpuQueueSubmitForIndex" {
+		if fnWGPU == "wgpuDevicePoll" || strings.HasPrefix(fnWGPU, "wgpuQueueSubmit") {
 			// if i understood correctly,
 			// those methods can run previously scheduled callbacks
+			//
+			// The prefix match covers wgpuQueueSubmitForIndex, which is the one
+			// Queue.Submit actually calls: marking it nocallback crashes the
+			// runtime as soon as a buffer map callback comes due during submit.
 			continue
 		}
 
