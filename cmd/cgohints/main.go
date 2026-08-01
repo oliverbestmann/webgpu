@@ -60,6 +60,33 @@ func main() {
 	}
 }
 
+// drainsCallbacks reports whether wgpu may run previously scheduled callbacks
+// while inside fn. Those must not be marked #cgo nocallback: the moment one
+// comes due the Go runtime aborts the process with "function marked with #cgo
+// nocallback called back into Go".
+//
+// Anything that maintains the device can drain its callback queue. That is
+// wgpuDevicePoll and the submit entry points by design, and the surface
+// operations as a consequence — reconfiguring a swapchain waits for pending
+// work first, and waiting is when queued callbacks run. A caller only reaches
+// this if it uses asynchronous buffer mapping, which is why the whole family
+// went unnoticed until timestamp queries were read back every frame.
+//
+// The cost of being wrong in this direction is a lost optimisation on a
+// handful of once-per-frame calls. The cost of being wrong in the other
+// direction is a crash, so the list errs wide.
+func drainsCallbacks(fn string) bool {
+	switch {
+	case fn == "wgpuDevicePoll":
+		return true
+	case strings.HasPrefix(fn, "wgpuQueueSubmit"):
+		return true
+	case strings.HasPrefix(fn, "wgpuSurface"):
+		return true
+	}
+	return false
+}
+
 func generateHints() string {
 	withCallback := map[string]bool{}
 	for _, fn := range FindFunctions() {
@@ -86,13 +113,7 @@ func generateHints() string {
 			continue
 		}
 
-		if fnWGPU == "wgpuDevicePoll" || strings.HasPrefix(fnWGPU, "wgpuQueueSubmit") {
-			// if i understood correctly,
-			// those methods can run previously scheduled callbacks
-			//
-			// The prefix match covers wgpuQueueSubmitForIndex, which is the one
-			// Queue.Submit actually calls: marking it nocallback crashes the
-			// runtime as soon as a buffer map callback comes due during submit.
+		if drainsCallbacks(fnWGPU) {
 			continue
 		}
 

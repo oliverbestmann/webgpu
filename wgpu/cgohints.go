@@ -59,8 +59,6 @@ package wgpu
 #cgo nocallback go_wgpuQueueWriteTexture
 #cgo noescape go_wgpuRenderPassEncoderEnd
 #cgo nocallback go_wgpuRenderPassEncoderEnd
-#cgo noescape go_wgpuSurfaceGetCurrentTexture
-#cgo nocallback go_wgpuSurfaceGetCurrentTexture
 #cgo noescape go_wgpuTextureCreateView
 #cgo nocallback go_wgpuTextureCreateView
 #cgo noescape wgpuAdapterGetFeatures
@@ -243,14 +241,6 @@ package wgpu
 #cgo nocallback wgpuSetLogLevel
 #cgo noescape wgpuShaderModuleRelease
 #cgo nocallback wgpuShaderModuleRelease
-#cgo noescape wgpuSurfaceConfigure
-#cgo nocallback wgpuSurfaceConfigure
-#cgo noescape wgpuSurfaceGetCapabilities
-#cgo nocallback wgpuSurfaceGetCapabilities
-#cgo noescape wgpuSurfacePresent
-#cgo nocallback wgpuSurfacePresent
-#cgo noescape wgpuSurfaceRelease
-#cgo nocallback wgpuSurfaceRelease
 #cgo noescape wgpuTextureDestroy
 #cgo nocallback wgpuTextureDestroy
 #cgo noescape wgpuTextureGetDepthOrArrayLayers
