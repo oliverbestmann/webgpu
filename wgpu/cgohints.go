@@ -67,14 +67,22 @@ package wgpu
 #cgo nocallback wgpuAdapterGetLimits
 #cgo noescape wgpuAdapterHasFeature
 #cgo nocallback wgpuAdapterHasFeature
+#cgo noescape wgpuBindGroupLayoutRelease
+#cgo nocallback wgpuBindGroupLayoutRelease
+#cgo noescape wgpuBindGroupRelease
+#cgo nocallback wgpuBindGroupRelease
 #cgo noescape wgpuBufferGetMappedRange
 #cgo nocallback wgpuBufferGetMappedRange
 #cgo noescape wgpuBufferGetSize
 #cgo nocallback wgpuBufferGetSize
 #cgo noescape wgpuBufferGetUsage
 #cgo nocallback wgpuBufferGetUsage
+#cgo noescape wgpuCommandBufferRelease
+#cgo nocallback wgpuCommandBufferRelease
 #cgo noescape wgpuCommandEncoderBeginComputePass
 #cgo nocallback wgpuCommandEncoderBeginComputePass
+#cgo noescape wgpuCommandEncoderRelease
+#cgo nocallback wgpuCommandEncoderRelease
 #cgo noescape wgpuComputePassEncoderBeginPipelineStatisticsQuery
 #cgo nocallback wgpuComputePassEncoderBeginPipelineStatisticsQuery
 #cgo noescape wgpuComputePassEncoderDispatchWorkgroups
@@ -89,12 +97,16 @@ package wgpu
 #cgo nocallback wgpuComputePassEncoderPopDebugGroup
 #cgo noescape wgpuComputePassEncoderPushDebugGroup
 #cgo nocallback wgpuComputePassEncoderPushDebugGroup
+#cgo noescape wgpuComputePassEncoderRelease
+#cgo nocallback wgpuComputePassEncoderRelease
 #cgo noescape wgpuComputePassEncoderSetBindGroup
 #cgo nocallback wgpuComputePassEncoderSetBindGroup
 #cgo noescape wgpuComputePassEncoderSetPipeline
 #cgo nocallback wgpuComputePassEncoderSetPipeline
 #cgo noescape wgpuComputePipelineGetBindGroupLayout
 #cgo nocallback wgpuComputePipelineGetBindGroupLayout
+#cgo noescape wgpuComputePipelineRelease
+#cgo nocallback wgpuComputePipelineRelease
 #cgo noescape wgpuCreateInstance
 #cgo nocallback wgpuCreateInstance
 #cgo noescape wgpuDeviceAddRef
@@ -117,6 +129,10 @@ package wgpu
 #cgo nocallback wgpuInstanceCreateSurface
 #cgo noescape wgpuInstanceEnumerateAdapters
 #cgo nocallback wgpuInstanceEnumerateAdapters
+#cgo noescape wgpuPipelineLayoutRelease
+#cgo nocallback wgpuPipelineLayoutRelease
+#cgo noescape wgpuQuerySetRelease
+#cgo nocallback wgpuQuerySetRelease
 #cgo noescape wgpuQueueGetTimestampPeriod
 #cgo nocallback wgpuQueueGetTimestampPeriod
 #cgo noescape wgpuRenderBundleEncoderDraw
@@ -135,6 +151,8 @@ package wgpu
 #cgo nocallback wgpuRenderBundleEncoderPopDebugGroup
 #cgo noescape wgpuRenderBundleEncoderPushDebugGroup
 #cgo nocallback wgpuRenderBundleEncoderPushDebugGroup
+#cgo noescape wgpuRenderBundleEncoderRelease
+#cgo nocallback wgpuRenderBundleEncoderRelease
 #cgo noescape wgpuRenderBundleEncoderSetBindGroup
 #cgo nocallback wgpuRenderBundleEncoderSetBindGroup
 #cgo noescape wgpuRenderBundleEncoderSetIndexBuffer
@@ -143,6 +161,8 @@ package wgpu
 #cgo nocallback wgpuRenderBundleEncoderSetPipeline
 #cgo noescape wgpuRenderBundleEncoderSetVertexBuffer
 #cgo nocallback wgpuRenderBundleEncoderSetVertexBuffer
+#cgo noescape wgpuRenderBundleRelease
+#cgo nocallback wgpuRenderBundleRelease
 #cgo noescape wgpuRenderPassEncoderBeginOcclusionQuery
 #cgo nocallback wgpuRenderPassEncoderBeginOcclusionQuery
 #cgo noescape wgpuRenderPassEncoderBeginPipelineStatisticsQuery
@@ -175,6 +195,8 @@ package wgpu
 #cgo nocallback wgpuRenderPassEncoderPopDebugGroup
 #cgo noescape wgpuRenderPassEncoderPushDebugGroup
 #cgo nocallback wgpuRenderPassEncoderPushDebugGroup
+#cgo noescape wgpuRenderPassEncoderRelease
+#cgo nocallback wgpuRenderPassEncoderRelease
 #cgo noescape wgpuRenderPassEncoderSetBindGroup
 #cgo nocallback wgpuRenderPassEncoderSetBindGroup
 #cgo noescape wgpuRenderPassEncoderSetBlendConstant
@@ -195,10 +217,16 @@ package wgpu
 #cgo nocallback wgpuRenderPassEncoderSetViewport
 #cgo noescape wgpuRenderPipelineGetBindGroupLayout
 #cgo nocallback wgpuRenderPipelineGetBindGroupLayout
+#cgo noescape wgpuRenderPipelineRelease
+#cgo nocallback wgpuRenderPipelineRelease
+#cgo noescape wgpuSamplerRelease
+#cgo nocallback wgpuSamplerRelease
 #cgo noescape wgpuSetLogCallback
 #cgo nocallback wgpuSetLogCallback
 #cgo noescape wgpuSetLogLevel
 #cgo nocallback wgpuSetLogLevel
+#cgo noescape wgpuTextureDestroy
+#cgo nocallback wgpuTextureDestroy
 #cgo noescape wgpuTextureGetDepthOrArrayLayers
 #cgo nocallback wgpuTextureGetDepthOrArrayLayers
 #cgo noescape wgpuTextureGetDimension
@@ -215,5 +243,9 @@ package wgpu
 #cgo nocallback wgpuTextureGetUsage
 #cgo noescape wgpuTextureGetWidth
 #cgo nocallback wgpuTextureGetWidth
+#cgo noescape wgpuTextureRelease
+#cgo nocallback wgpuTextureRelease
+#cgo noescape wgpuTextureViewRelease
+#cgo nocallback wgpuTextureViewRelease
 */
 import "C"
