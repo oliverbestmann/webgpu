@@ -183,6 +183,7 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 				maxVertexBufferArrayStride:                C.uint32_t(l.MaxVertexBufferArrayStride),
 				maxInterStageShaderVariables:              C.uint32_t(l.MaxInterStageShaderVariables),
 				maxColorAttachments:                       C.uint32_t(l.MaxColorAttachments),
+				maxColorAttachmentBytesPerSample:          C.uint32_t(l.MaxColorAttachmentBytesPerSample),
 				maxComputeWorkgroupStorageSize:            C.uint32_t(l.MaxComputeWorkgroupStorageSize),
 				maxComputeInvocationsPerWorkgroup:         C.uint32_t(l.MaxComputeInvocationsPerWorkgroup),
 				maxComputeWorkgroupSizeX:                  C.uint32_t(l.MaxComputeWorkgroupSizeX),
