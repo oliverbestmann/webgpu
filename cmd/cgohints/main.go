@@ -72,9 +72,15 @@ func main() {
 // this if it uses asynchronous buffer mapping, which is why the whole family
 // went unnoticed until timestamp queries were read back every frame.
 //
+// Tearing an object down settles the callbacks it still owes. Dropping the
+// last reference to a buffer whose map has not completed invokes the map
+// callback with an aborted status from inside wgpuBufferRelease, and unmapping
+// a map that is still in flight does the same. Releasing is how a program
+// exits, so this is the variant that shows up as a crash on the close button.
+//
 // The cost of being wrong in this direction is a lost optimisation on a
-// handful of once-per-frame calls. The cost of being wrong in the other
-// direction is a crash, so the list errs wide.
+// handful of calls, none of them per-draw. The cost of being wrong in the
+// other direction is a crash, so the list errs wide.
 func drainsCallbacks(fn string) bool {
 	switch {
 	case fn == "wgpuDevicePoll":
@@ -82,6 +88,10 @@ func drainsCallbacks(fn string) bool {
 	case strings.HasPrefix(fn, "wgpuQueueSubmit"):
 		return true
 	case strings.HasPrefix(fn, "wgpuSurface"):
+		return true
+	case strings.HasSuffix(fn, "Release"), strings.HasSuffix(fn, "Destroy"):
+		return true
+	case fn == "wgpuBufferUnmap":
 		return true
 	}
 	return false
