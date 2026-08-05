@@ -1,3 +1,5 @@
+//go:build !js
+
 package wgpu
 
 // #include "gen_wgpu_wrappers.h"
