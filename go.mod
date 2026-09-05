@@ -19,3 +19,5 @@ require (
 )
 
 retract v1.27.0 // published before deciding on a version scheme. we start at v1.0.0
+
+retract v1.34.1 // served by the proxy under the old module path before the fork had its own tags

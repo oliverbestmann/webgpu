@@ -66,8 +66,3 @@ dependencies in.
 ## Examples
 
 You can find some examples in the examples directory: https://github.com/dhannyell/webgpu/tree/fk-main/examples
-
-## Special thanks
-
-This is a fork of [cogentcore/webgpu/](https://github.com/cogentcore/webgpu/). Thanks to them for the work they put into
-WebGPU for Go.

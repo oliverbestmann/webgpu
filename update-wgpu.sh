@@ -56,7 +56,7 @@ function fetch-libs-repository {
       mkdir repo
       pushd repo
         git init .
-        git remote add origin https://github.com/oliverbestmann/webgpu
+        git remote add origin https://github.com/dhannyell/webgpu
       popd
     fi
 
@@ -134,7 +134,7 @@ write-gitattributes
 push-libs-repository
 
 for SYSTEM in $SYSTEMS ; do
-  env GOPROXY=direct go get -u github.com/oliverbestmann/webgpu/libs-$SYSTEM@libs-$SYSTEM
+  env GOPROXY=direct go get -u github.com/dhannyell/webgpu/libs-$SYSTEM@libs-$SYSTEM
 done
 
 # re-generate enums & bindings
