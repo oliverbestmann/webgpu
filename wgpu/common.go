@@ -61,8 +61,12 @@ type Limits struct {
 	MaxComputeWorkgroupSizeZ                  uint32
 	MaxComputeWorkgroupsPerDimension          uint32
 
-	MaxImmediateSize      uint32
-	MaxNonSamplerBindings uint32
+	MaxImmediateSize uint32
+
+	// wgpu-native extensions (WGPUNativeLimits).
+	MaxNonSamplerBindings                        uint32
+	MaxBindingArrayElementsPerShaderStage        uint32
+	MaxBindingArraySamplerElementsPerShaderStage uint32
 }
 
 // Color as described:

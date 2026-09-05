@@ -3,6 +3,7 @@
 package wgpu
 
 /*
+#cgo CFLAGS: -Werror=incompatible-pointer-types
 
 #include <wgpu.h>
 
@@ -21,15 +22,23 @@ void gowebgpu_request_device_callback_c(WGPURequestDeviceStatus status, WGPUDevi
   gowebgpu_request_device_callback_go(status, device, message, userdata1);
 }
 
-void gowebgpu_device_lost_callback_c(WGPUDeviceLostReason reason, char const * message, void * userdata) {
-  extern void gowebgpu_device_lost_callback_go(WGPUDeviceLostReason reason, char const * message, void * userdata);
-  gowebgpu_device_lost_callback_go(reason, message, userdata);
+void gowebgpu_device_lost_callback_c(WGPUDevice const * device, WGPUDeviceLostReason reason, WGPUStringView message, void * userdata1, void * userdata2) {
+  extern void gowebgpu_device_lost_callback_go(WGPUDeviceLostReason reason, WGPUStringView message, void * userdata);
+  gowebgpu_device_lost_callback_go(reason, message, userdata1);
 }
 
-void gowebgpu_queue_work_done_callback_c(WGPUQueueWorkDoneStatus status, void * userdata) {
+void gowebgpu_queue_work_done_callback_c(WGPUQueueWorkDoneStatus status, WGPUStringView message, void * userdata1, void * userdata2) {
   extern void gowebgpu_queue_work_done_callback_go(WGPUQueueWorkDoneStatus status, void * userdata);
-  gowebgpu_queue_work_done_callback_go(status, userdata);
+  gowebgpu_queue_work_done_callback_go(status, userdata1);
 }
+
+// Each trampoline must match the callback typedef of the header, or the
+// arguments arrive shifted at runtime.
+static WGPUBufferMapCallback const gowebgpu_check_buffer_map = gowebgpu_buffer_map_callback_c;
+static WGPURequestAdapterCallback const gowebgpu_check_request_adapter = gowebgpu_request_adapter_callback_c;
+static WGPURequestDeviceCallback const gowebgpu_check_request_device = gowebgpu_request_device_callback_c;
+static WGPUDeviceLostCallback const gowebgpu_check_device_lost = gowebgpu_device_lost_callback_c;
+static WGPUQueueWorkDoneCallback const gowebgpu_check_queue_work_done = gowebgpu_queue_work_done_callback_c;
 
 */
 import "C"
