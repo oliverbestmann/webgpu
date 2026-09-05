@@ -926,7 +926,7 @@ func (g *Device) GetFeatures() []FeatureName {
 func (g *Device) GetLimits() Limits {
 	var limits C.WGPULimits
 
-	nativeLimits := callocOne[C.WGPUNativeLimits]()
+	nativeLimits := newNativeLimitsChain()
 	defer free(nativeLimits)
 	limits.nextInChain = (*C.WGPUChainedStruct)(unsafe.Pointer(nativeLimits))
 
@@ -964,7 +964,9 @@ func (g *Device) GetLimits() Limits {
 		MaxComputeWorkgroupsPerDimension:          uint32(limits.maxComputeWorkgroupsPerDimension),
 		MaxImmediateSize:                          uint32(limits.maxImmediateSize),
 
-		MaxNonSamplerBindings: uint32(nativeLimits.maxNonSamplerBindings),
+		MaxNonSamplerBindings:                        uint32(nativeLimits.maxNonSamplerBindings),
+		MaxBindingArrayElementsPerShaderStage:        uint32(nativeLimits.maxBindingArrayElementsPerShaderStage),
+		MaxBindingArraySamplerElementsPerShaderStage: uint32(nativeLimits.maxBindingArraySamplerElementsPerShaderStage),
 	}
 }
 

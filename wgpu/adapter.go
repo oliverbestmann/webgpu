@@ -8,7 +8,7 @@ package wgpu
 #include <wgpu.h>
 
 extern void gowebgpu_request_device_callback_c(WGPURequestDeviceStatus status, WGPUDevice device, char const *message, void *userdata);
-extern void gowebgpu_device_lost_callback_c(WGPUDeviceLostReason reason, char const * message, void * userdata);
+extern void gowebgpu_device_lost_callback_c(WGPUDevice const * device, WGPUDeviceLostReason reason, WGPUStringView message, void * userdata1, void * userdata2);
 
 */
 import "C"
@@ -35,7 +35,7 @@ func (g *Adapter) GetFeatures() []FeatureName {
 func (g *Adapter) GetLimits() Limits {
 	var limits C.WGPULimits
 
-	nativeLimits := callocOne[C.WGPUNativeLimits]()
+	nativeLimits := newNativeLimitsChain()
 	defer free(nativeLimits)
 	limits.nextInChain = (*C.WGPUChainedStruct)(unsafe.Pointer(nativeLimits))
 
@@ -74,8 +74,22 @@ func (g *Adapter) GetLimits() Limits {
 		MaxComputeWorkgroupsPerDimension:          uint32(limits.maxComputeWorkgroupsPerDimension),
 		MaxImmediateSize:                          uint32(limits.maxImmediateSize),
 
-		MaxNonSamplerBindings: uint32(nativeLimits.maxNonSamplerBindings),
+		MaxNonSamplerBindings:                        uint32(nativeLimits.maxNonSamplerBindings),
+		MaxBindingArrayElementsPerShaderStage:        uint32(nativeLimits.maxBindingArrayElementsPerShaderStage),
+		MaxBindingArraySamplerElementsPerShaderStage: uint32(nativeLimits.maxBindingArraySamplerElementsPerShaderStage),
 	}
+}
+
+// newNativeLimitsChain allocates a WGPUNativeLimits with the sType set and every
+// limit undefined. wgpu-native ignores the chain without the sType. The caller frees it.
+func newNativeLimitsChain() *C.WGPUNativeLimits {
+	nativeLimits := callocOne[C.WGPUNativeLimits]()
+	nativeLimits.chain.next = nil
+	nativeLimits.chain.sType = C.WGPUSType_NativeLimits
+	nativeLimits.maxNonSamplerBindings = C.WGPU_LIMIT_U32_UNDEFINED
+	nativeLimits.maxBindingArrayElementsPerShaderStage = C.WGPU_LIMIT_U32_UNDEFINED
+	nativeLimits.maxBindingArraySamplerElementsPerShaderStage = C.WGPU_LIMIT_U32_UNDEFINED
+	return nativeLimits
 }
 
 func (g *Adapter) GetInfo() AdapterInfo {
@@ -115,13 +129,13 @@ func gowebgpu_request_device_callback_go(status C.WGPURequestDeviceStatus, devic
 }
 
 //export gowebgpu_device_lost_callback_go
-func gowebgpu_device_lost_callback_go(reason C.WGPUDeviceLostReason, message *C.char, userdata unsafe.Pointer) {
+func gowebgpu_device_lost_callback_go(reason C.WGPUDeviceLostReason, message C.WGPUStringView, userdata unsafe.Pointer) {
 	handle := lookupHandle(userdata)
 	defer handle.Delete()
 
 	cb, ok := handle.Value().(DeviceLostCallback)
 	if ok {
-		cb(DeviceLostReason(reason), C.GoString(message))
+		cb(DeviceLostReason(reason), C.GoStringN(message.data, C.int(message.length)))
 	}
 }
 
@@ -194,12 +208,12 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 			}
 			desc.requiredLimits = requiredLimits
 
-			nativeLimits := callocOne[C.WGPUNativeLimits]()
+			nativeLimits := newNativeLimitsChain()
 			defer free(nativeLimits)
 
-			nativeLimits.chain.next = nil
-			nativeLimits.chain.sType = C.WGPUSType_NativeLimits
 			nativeLimits.maxNonSamplerBindings = C.uint32_t(l.MaxNonSamplerBindings)
+			nativeLimits.maxBindingArrayElementsPerShaderStage = C.uint32_t(l.MaxBindingArrayElementsPerShaderStage)
+			nativeLimits.maxBindingArraySamplerElementsPerShaderStage = C.uint32_t(l.MaxBindingArraySamplerElementsPerShaderStage)
 
 			desc.requiredLimits.nextInChain = (*C.WGPUChainedStruct)(unsafe.Pointer(nativeLimits))
 		}
@@ -208,6 +222,7 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 			handle := newHandle(descriptor.DeviceLostCallback)
 
 			desc.deviceLostCallbackInfo = C.WGPUDeviceLostCallbackInfo{
+				mode:      C.WGPUCallbackMode_AllowSpontaneous,
 				callback:  C.WGPUDeviceLostCallback(C.gowebgpu_device_lost_callback_c),
 				userdata1: handle.ToPointer(),
 			}
@@ -239,6 +254,7 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 	}
 	handle := newHandle(cb)
 	C.wgpuAdapterRequestDevice(g.ref, desc, C.WGPURequestDeviceCallbackInfo{
+		mode:      C.WGPUCallbackMode_AllowSpontaneous,
 		callback:  C.WGPURequestDeviceCallback(C.gowebgpu_request_device_callback_c),
 		userdata1: handle.ToPointer(),
 	})

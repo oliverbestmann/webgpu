@@ -178,3 +178,49 @@ func BenchmarkBeginRenderPass(b *testing.B) {
 		enc.Release()
 	}
 }
+
+func TestRequestDeviceWithAdapterLimits(t *testing.T) {
+	instance := CreateInstance(nil)
+
+	adapter, err := instance.RequestAdapter(&RequestAdapterOptions{
+		ForceFallbackAdapter: true,
+	})
+	require.NoError(t, err)
+	defer adapter.Release()
+
+	limits := adapter.GetLimits()
+	require.NotZero(t, limits.MaxNonSamplerBindings)
+
+	device, err := adapter.RequestDevice(&DeviceDescriptor{
+		RequiredLimits:     &limits,
+		DeviceLostCallback: func(DeviceLostReason, string) {},
+	})
+	require.NoError(t, err)
+	defer device.Release()
+
+	require.NotZero(t, device.GetLimits().MaxNonSamplerBindings)
+}
+
+func TestOnSubmittedWorkDone(t *testing.T) {
+	instance := CreateInstance(nil)
+
+	adapter, err := instance.RequestAdapter(&RequestAdapterOptions{
+		ForceFallbackAdapter: true,
+	})
+	require.NoError(t, err)
+	defer adapter.Release()
+
+	device, err := adapter.RequestDevice(nil)
+	require.NoError(t, err)
+	defer device.Release()
+
+	queue := device.GetQueue()
+	defer queue.Release()
+
+	done := make(chan QueueWorkDoneStatus, 1)
+	queue.Submit()
+	queue.OnSubmittedWorkDone(func(status QueueWorkDoneStatus) { done <- status })
+	device.Poll(true, nil)
+
+	require.Equal(t, QueueWorkDoneStatusSuccess, <-done)
+}

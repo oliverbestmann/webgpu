@@ -213,6 +213,7 @@ func (g *Instance) RequestAdapter(options *RequestAdapterOptions) (*Adapter, err
 	}
 	handle := newHandle(cb)
 	C.wgpuInstanceRequestAdapter(g.ref, opts, C.WGPURequestAdapterCallbackInfo{
+		mode:      C.WGPUCallbackMode_AllowSpontaneous,
 		callback:  C.WGPURequestAdapterCallback(C.gowebgpu_request_adapter_callback_c),
 		userdata1: handle.ToPointer(),
 	})

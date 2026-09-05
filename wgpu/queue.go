@@ -4,7 +4,7 @@ package wgpu
 
 /*
 #include "gen_wgpu_wrappers.h"
-extern void gowebgpu_queue_work_done_callback_c(WGPUQueueWorkDoneStatus status, void * userdata);
+extern void gowebgpu_queue_work_done_callback_c(WGPUQueueWorkDoneStatus status, WGPUStringView message, void * userdata1, void * userdata2);
 */
 import "C"
 import (
@@ -33,7 +33,7 @@ func (p *Queue) OnSubmittedWorkDone(callback QueueWorkDoneCallback) {
 	handle := newHandle(callback)
 
 	C.wgpuQueueOnSubmittedWorkDone(p.ref, C.WGPUQueueWorkDoneCallbackInfo{
-		mode:      C.WGPUCallbackMode_AllowProcessEvents,
+		mode:      C.WGPUCallbackMode_AllowSpontaneous,
 		callback:  C.WGPUQueueWorkDoneCallback(C.gowebgpu_queue_work_done_callback_c),
 		userdata1: handle.ToPointer(),
 	})
