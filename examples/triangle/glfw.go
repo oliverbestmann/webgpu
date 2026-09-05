@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/go-gl/glfw/v3.4/glfw"
-	"github.com/oliverbestmann/webgpu/wgpuglfw"
+	"github.com/dhannyell/webgpu/wgpuglfw"
 )
 
 func main() {

@@ -6,7 +6,7 @@ import (
 	"syscall/js"
 	"time"
 
-	"github.com/oliverbestmann/webgpu/wgpu"
+	"github.com/dhannyell/webgpu/wgpu"
 )
 
 type window struct{}

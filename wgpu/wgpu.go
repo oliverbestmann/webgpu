@@ -5,17 +5,17 @@ package wgpu
 import (
 	"errors"
 
-	_ "github.com/oliverbestmann/webgpu/libs-android"
+	_ "github.com/dhannyell/webgpu/libs-android"
 
-	_ "github.com/oliverbestmann/webgpu/libs-darwin"
+	_ "github.com/dhannyell/webgpu/libs-darwin"
 
-	_ "github.com/oliverbestmann/webgpu/libs-ios"
+	_ "github.com/dhannyell/webgpu/libs-ios"
 
-	_ "github.com/oliverbestmann/webgpu/libs-linux"
+	_ "github.com/dhannyell/webgpu/libs-linux"
 
 	"runtime"
 
-	_ "github.com/oliverbestmann/webgpu/libs-windows"
+	_ "github.com/dhannyell/webgpu/libs-windows"
 )
 
 /*

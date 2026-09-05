@@ -6,7 +6,7 @@ import (
 	"unsafe"
 
 	"github.com/go-gl/glfw/v3.4/glfw"
-	"github.com/oliverbestmann/webgpu/wgpu"
+	"github.com/dhannyell/webgpu/wgpu"
 )
 
 func GetSurfaceDescriptor(w *glfw.Window) *wgpu.SurfaceDescriptor {

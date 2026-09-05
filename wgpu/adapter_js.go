@@ -5,7 +5,7 @@ package wgpu
 import (
 	"fmt"
 
-	"github.com/oliverbestmann/webgpu/jsx"
+	"github.com/dhannyell/webgpu/jsx"
 )
 
 func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {

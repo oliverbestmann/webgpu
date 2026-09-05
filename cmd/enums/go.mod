@@ -1,4 +1,4 @@
-module github.com/oliverbestmann/webgpu/cmd/enums
+module github.com/dhannyell/webgpu/cmd/enums
 
 go 1.25
 

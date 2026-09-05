@@ -7,7 +7,7 @@ import (
 	"syscall/js"
 	"unsafe"
 
-	"github.com/oliverbestmann/webgpu/jsx"
+	"github.com/dhannyell/webgpu/jsx"
 )
 
 // Submit as described:

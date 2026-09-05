@@ -1,14 +1,14 @@
-module github.com/oliverbestmann/webgpu
+module github.com/dhannyell/webgpu
 
 go 1.25
 
 require (
+	github.com/dhannyell/webgpu/libs-android v0.0.0-20260905020343-c4069cac051c
+	github.com/dhannyell/webgpu/libs-darwin v0.0.0-20260905020352-092624e3a385
+	github.com/dhannyell/webgpu/libs-ios v0.0.0-20260905020358-fb13dc722108
+	github.com/dhannyell/webgpu/libs-linux v0.0.0-20260905020403-4ea5c475cbbd
+	github.com/dhannyell/webgpu/libs-windows v0.0.0-20260905020407-128027db48f4
 	github.com/go-gl/glfw/v3.4/glfw v0.1.0-pre.1.0.20260628091122-0bd588dc30cf
-	github.com/oliverbestmann/webgpu/libs-android v0.0.0-20260628152806-6b27e30a172e
-	github.com/oliverbestmann/webgpu/libs-darwin v0.0.0-20260628152755-66a5dfa57f8d
-	github.com/oliverbestmann/webgpu/libs-ios v0.0.0-20260628152757-fe2537e7ddac
-	github.com/oliverbestmann/webgpu/libs-linux v0.0.0-20260628152803-421b8a341d08
-	github.com/oliverbestmann/webgpu/libs-windows v0.0.0-20260628152801-f47d1b682eb8
 	github.com/stretchr/testify v1.11.1
 )
 

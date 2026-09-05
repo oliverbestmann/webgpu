@@ -1,9 +1,15 @@
-[![Go Reference](https://pkg.go.dev/badge/github.com/oliverbestmann/webgpu/wgpu.svg)](https://pkg.go.dev/github.com/oliverbestmann/webgpu/wgpu)
-![CI workflow](https://github.com/oliverbestmann/webgpu/actions/workflows/ci.yml/badge.svg)
+[![Go Reference](https://pkg.go.dev/badge/github.com/dhannyell/webgpu/wgpu.svg)](https://pkg.go.dev/github.com/dhannyell/webgpu/wgpu)
+![CI workflow](https://github.com/dhannyell/webgpu/actions/workflows/ci.yml/badge.svg)
 
 # WebGPU
 
 Current upstream version: v29.0.0.0
+
+## Fork
+
+This is a fork of `github.com/oliverbestmann/webgpu`. It follows upstream release `v1.34.1`. Its own versions start at `v1.35.0` — a patch bump per fix, a minor bump per upstream sync.
+
+Sync is `git fetch upstream` (the upstream remote is configured with `tagOpt --no-tags`) followed by `git merge` into `fk-main`. Upstream tags are not carried by the fork.
 
 Go bindings for WebGPU, a cross-platform, safe graphics API.
 
@@ -52,14 +58,14 @@ This repository uses prebuild libraries provided by `wgpu-native`. All libraries
 which is more than `go get` allows in a single library. This is an "opinionated limit" by golang which is not configurable.
 
 To work around that, libraries for the different systems are split into branches. An example is here:
-https://github.com/oliverbestmann/webgpu/tree/libs-linux/libs-linux
+https://github.com/dhannyell/webgpu/tree/libs-linux/libs-linux
 
 The `update-wgpu.sh` script updates all those branches and updates the go.mod file to pull the prebuild libraries as
 dependencies in.
 
 ## Examples
 
-You can find some examples in the examples directory: https://github.com/oliverbestmann/webgpu/tree/main/examples
+You can find some examples in the examples directory: https://github.com/dhannyell/webgpu/tree/fk-main/examples
 
 ## Special thanks
 
