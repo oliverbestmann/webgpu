@@ -87,7 +87,7 @@ func (p *CommandEncoder) TryBeginRenderPass(descriptor *RenderPassDescriptor) (*
 			depthStencilAttachment.stencilLoadOp = C.WGPULoadOp(descriptor.DepthStencilAttachment.StencilLoadOp)
 			depthStencilAttachment.stencilStoreOp = C.WGPUStoreOp(descriptor.DepthStencilAttachment.StencilStoreOp)
 			depthStencilAttachment.stencilClearValue = C.uint32_t(descriptor.DepthStencilAttachment.StencilClearValue)
-			depthStencilAttachment.stencilReadOnly = cBool(descriptor.DepthStencilAttachment.DepthReadOnly)
+			depthStencilAttachment.stencilReadOnly = cBool(descriptor.DepthStencilAttachment.StencilReadOnly)
 
 			desc.depthStencilAttachment = depthStencilAttachment
 		}

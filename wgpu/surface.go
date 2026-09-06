@@ -81,7 +81,7 @@ func (g *Surface) Configure(device *Device, config *SurfaceConfiguration) {
 				chain: C.WGPUChainedStruct{
 					sType: C.WGPUSType_SurfaceConfigurationExtras,
 				},
-				desiredMaximumFrameLatency: 1,
+				desiredMaximumFrameLatency: C.uint32_t(config.DesiredMaximumFrameLatency),
 			}
 
 			pinner.Pin(nextInChain)
