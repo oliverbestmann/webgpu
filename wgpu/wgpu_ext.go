@@ -28,22 +28,50 @@ var (
 	ColorRed         = Color{1, 0, 0, 1}
 	ColorGreen       = Color{0, 1, 0, 1}
 	ColorBlue        = Color{0, 0, 1, 1}
+)
 
+var (
 	BlendComponentReplace = BlendComponent{
 		SrcFactor: BlendFactorOne,
 		DstFactor: BlendFactorZero,
 		Operation: BlendOperationAdd,
 	}
+
 	BlendComponentOver = BlendComponent{
 		SrcFactor: BlendFactorOne,
 		DstFactor: BlendFactorOneMinusSrcAlpha,
 		Operation: BlendOperationAdd,
 	}
 
+	BlendComponentAdd = BlendComponent{
+		SrcFactor: BlendFactorSrcAlpha,
+		DstFactor: BlendFactorOne,
+		Operation: BlendOperationAdd,
+	}
+
+	BlendComponentMultiply = BlendComponent{
+		SrcFactor: BlendFactorDst,
+		DstFactor: BlendFactorZero,
+		Operation: BlendOperationAdd,
+	}
+)
+
+var (
 	BlendStateReplace = BlendState{
 		Color: BlendComponentReplace,
 		Alpha: BlendComponentReplace,
 	}
+
+	BlendStateAdd = BlendState{
+		Color: BlendComponentAdd,
+		Alpha: BlendComponentAdd,
+	}
+
+	BlendStateMultiply = BlendState{
+		Color: BlendComponentMultiply,
+		Alpha: BlendComponentReplace,
+	}
+
 	BlendStateAlphaBlending = BlendState{
 		Color: BlendComponent{
 			SrcFactor: BlendFactorSrcAlpha,
@@ -52,6 +80,7 @@ var (
 		},
 		Alpha: BlendComponentOver,
 	}
+
 	BlendStatePremultipliedAlphaBlending = BlendState{
 		Color: BlendComponentOver,
 		Alpha: BlendComponentOver,

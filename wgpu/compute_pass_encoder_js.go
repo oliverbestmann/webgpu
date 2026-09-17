@@ -9,11 +9,16 @@ import (
 // ComputePassDescriptor as described:
 // https://gpuweb.github.io/gpuweb/#dictdef-gpucomputepassdescriptor
 type ComputePassDescriptor struct {
-	Label string
+	Label           string
+	TimestampWrites *PassTimestampWrites
 }
 
 func (g *ComputePassDescriptor) toJS() any {
-	return map[string]any{"label": g.Label}
+	result := map[string]any{"label": g.Label}
+	if writes := g.TimestampWrites.toJS(); writes != nil {
+		result["timestampWrites"] = writes
+	}
+	return result
 }
 
 // SetPipeline as described:

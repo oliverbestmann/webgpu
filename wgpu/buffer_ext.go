@@ -8,8 +8,7 @@ func FromBytes[E any](src []byte) []E {
 		return nil
 	}
 
-	var zero E
-	elmSize := unsafe.Sizeof(zero)
+	elmSize := sizeOf[E]()
 	if l%elmSize != 0 {
 		panic("invalid src")
 	}
@@ -23,6 +22,6 @@ func ToBytes[E any](src []E) []byte {
 		return nil
 	}
 
-	elmSize := unsafe.Sizeof(src[0])
+	elmSize := sizeOf[E]()
 	return unsafe.Slice((*byte)(unsafe.Pointer(&src[0])), l*elmSize)
 }

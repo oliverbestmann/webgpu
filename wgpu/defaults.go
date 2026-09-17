@@ -34,5 +34,9 @@ func DefaultLimits() Limits {
 		MaxComputeWorkgroupSizeZ:                  LimitU32Undefined,
 		MaxComputeWorkgroupsPerDimension:          LimitU32Undefined,
 		MaxImmediateSize:                          LimitU32Undefined,
+
+		MaxNonSamplerBindings:                        LimitU32Undefined,
+		MaxBindingArrayElementsPerShaderStage:        LimitU32Undefined,
+		MaxBindingArraySamplerElementsPerShaderStage: LimitU32Undefined,
 	}
 }

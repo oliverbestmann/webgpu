@@ -53,6 +53,7 @@ func (p *Buffer) TryMapAsync(mode MapMode, offset uint64, size uint64, callback 
 		C.size_t(offset),
 		C.size_t(size),
 		C.WGPUBufferMapCallbackInfo{
+			mode:      C.WGPUCallbackMode_AllowSpontaneous,
 			callback:  C.WGPUBufferMapCallback(C.gowebgpu_buffer_map_callback_c),
 			userdata1: callbackHandle.ToPointer(),
 		},

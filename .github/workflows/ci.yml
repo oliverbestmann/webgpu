@@ -52,8 +52,15 @@ jobs:
           set -x
           cd wgpu
           go vet ./...
-          go test ./...
         shell: bash
+
+      - name: Run tests
+        if: ${{ matrix.run_examples }}
+        run: |
+          set -x
+          export WGPU_FORCE_FALLBACK_ADAPTER=1
+          export WGPU_LOG_LEVEL=TRACE
+          go test ./...
 
       - name: Run examples
         if: ${{ matrix.run_examples }}

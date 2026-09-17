@@ -6,14 +6,22 @@ package wgpu
 import "C"
 import (
 	"errors"
-	"unsafe"
 )
 
 type ComputePassDescriptor struct {
-	Label string
+	Label           string
+	TimestampWrites *PassTimestampWrites
+}
 
-	// unused in wgpu
-	// TimestampWrites []ComputePassTimestampWrite
+func cPassTimestampWrites(w *PassTimestampWrites) (*C.WGPUPassTimestampWrites, func()) {
+	if w == nil || w.QuerySet == nil {
+		return nil, func() {}
+	}
+	writes := callocOne[C.WGPUPassTimestampWrites]()
+	writes.querySet = w.QuerySet.ref
+	writes.beginningOfPassWriteIndex = C.uint32_t(w.BeginningOfPassWriteIndex)
+	writes.endOfPassWriteIndex = C.uint32_t(w.EndOfPassWriteIndex)
+	return writes, func() { free(writes) }
 }
 
 func (p *CommandEncoder) BeginComputePass(descriptor *ComputePassDescriptor) *ComputePassEncoder {
@@ -23,6 +31,10 @@ func (p *CommandEncoder) BeginComputePass(descriptor *ComputePassDescriptor) *Co
 		label := stringViewOf(descriptor.Label)
 		defer label.Release()
 		desc.label = label.ToC()
+
+		timestampWrites, release := cPassTimestampWrites(descriptor.TimestampWrites)
+		defer release()
+		desc.timestampWrites = timestampWrites
 	}
 
 	ref := C.wgpuCommandEncoderBeginComputePass(p.ref, &desc)
@@ -45,10 +57,8 @@ func (p *CommandEncoder) TryBeginRenderPass(descriptor *RenderPassDescriptor) (*
 
 		colorAttachmentCount := len(descriptor.ColorAttachments)
 		if colorAttachmentCount > 0 {
-			colorAttachments := C.calloc(C.size_t(unsafe.Sizeof(C.WGPURenderPassColorAttachment{})), C.size_t(colorAttachmentCount))
-			defer C.free(colorAttachments)
-
-			colorAttachmentsSlice := unsafe.Slice((*C.WGPURenderPassColorAttachment)(colorAttachments), colorAttachmentCount)
+			colorAttachments, colorAttachmentsSlice := callocSlice[C.WGPURenderPassColorAttachment](colorAttachmentCount)
+			defer free(colorAttachments)
 
 			for i, v := range descriptor.ColorAttachments {
 				colorAttachment := C.WGPURenderPassColorAttachment{
@@ -73,12 +83,12 @@ func (p *CommandEncoder) TryBeginRenderPass(descriptor *RenderPassDescriptor) (*
 			}
 
 			desc.colorAttachmentCount = C.size_t(colorAttachmentCount)
-			desc.colorAttachments = (*C.WGPURenderPassColorAttachment)(colorAttachments)
+			desc.colorAttachments = colorAttachments
 		}
 
 		if descriptor.DepthStencilAttachment != nil {
-			depthStencilAttachment := (*C.WGPURenderPassDepthStencilAttachment)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPURenderPassDepthStencilAttachment{}))))
-			defer C.free(unsafe.Pointer(depthStencilAttachment))
+			depthStencilAttachment := callocOne[C.WGPURenderPassDepthStencilAttachment]()
+			defer free(depthStencilAttachment)
 
 			if descriptor.DepthStencilAttachment.View != nil {
 				depthStencilAttachment.view = descriptor.DepthStencilAttachment.View.ref
@@ -90,10 +100,14 @@ func (p *CommandEncoder) TryBeginRenderPass(descriptor *RenderPassDescriptor) (*
 			depthStencilAttachment.stencilLoadOp = C.WGPULoadOp(descriptor.DepthStencilAttachment.StencilLoadOp)
 			depthStencilAttachment.stencilStoreOp = C.WGPUStoreOp(descriptor.DepthStencilAttachment.StencilStoreOp)
 			depthStencilAttachment.stencilClearValue = C.uint32_t(descriptor.DepthStencilAttachment.StencilClearValue)
-			depthStencilAttachment.stencilReadOnly = cBool(descriptor.DepthStencilAttachment.DepthReadOnly)
+			depthStencilAttachment.stencilReadOnly = cBool(descriptor.DepthStencilAttachment.StencilReadOnly)
 
 			desc.depthStencilAttachment = depthStencilAttachment
 		}
+
+		timestampWrites, release := cPassTimestampWrites(descriptor.TimestampWrites)
+		defer release()
+		desc.timestampWrites = timestampWrites
 	}
 
 	errh := acquireErrorCallback()
@@ -310,7 +324,7 @@ func (p *CommandEncoder) TryFinish(descriptor *CommandBufferDescriptor) (*Comman
 
 	if descriptor != nil && descriptor.Label != "" {
 		label := C.CString(descriptor.Label)
-		defer C.free(unsafe.Pointer(label))
+		defer free(label)
 
 		desc = &C.WGPUCommandBufferDescriptor{
 			label: C.WGPUStringView{data: label, length: C.WGPU_STRLEN},

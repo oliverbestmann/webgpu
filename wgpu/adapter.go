@@ -8,7 +8,7 @@ package wgpu
 #include <wgpu.h>
 
 extern void gowebgpu_request_device_callback_c(WGPURequestDeviceStatus status, WGPUDevice device, char const *message, void *userdata);
-extern void gowebgpu_device_lost_callback_c(WGPUDeviceLostReason reason, char const * message, void * userdata);
+extern void gowebgpu_device_lost_callback_c(WGPUDevice const * device, WGPUDeviceLostReason reason, WGPUStringView message, void * userdata1, void * userdata2);
 
 */
 import "C"
@@ -20,12 +20,12 @@ import (
 func (g *Adapter) GetFeatures() []FeatureName {
 	var supportedFeatures C.WGPUSupportedFeatures
 	C.wgpuAdapterGetFeatures(g.ref, (*C.WGPUSupportedFeatures)(unsafe.Pointer(&supportedFeatures)))
-	defer C.free(unsafe.Pointer(supportedFeatures.features))
+	defer free(supportedFeatures.features)
 
 	features := make([]FeatureName, supportedFeatures.featureCount)
 
 	for i := range int(supportedFeatures.featureCount) {
-		offset := uintptr(i) * unsafe.Sizeof(C.WGPUFeatureName(0))
+		offset := uintptr(i) * sizeOf[C.WGPUFeatureName]()
 		features[i] = FeatureName(*(*C.WGPUFeatureName)(unsafe.Pointer(uintptr(unsafe.Pointer(supportedFeatures.features)) + offset)))
 	}
 
@@ -35,8 +35,8 @@ func (g *Adapter) GetFeatures() []FeatureName {
 func (g *Adapter) GetLimits() Limits {
 	var limits C.WGPULimits
 
-	nativeLimits := (*C.WGPUNativeLimits)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPUNativeLimits{}))))
-	defer C.free(unsafe.Pointer(nativeLimits))
+	nativeLimits := newNativeLimitsChain()
+	defer free(nativeLimits)
 	limits.nextInChain = (*C.WGPUChainedStruct)(unsafe.Pointer(nativeLimits))
 
 	C.wgpuAdapterGetLimits(g.ref, &limits)
@@ -74,8 +74,22 @@ func (g *Adapter) GetLimits() Limits {
 		MaxComputeWorkgroupsPerDimension:          uint32(limits.maxComputeWorkgroupsPerDimension),
 		MaxImmediateSize:                          uint32(limits.maxImmediateSize),
 
-		MaxNonSamplerBindings: uint32(nativeLimits.maxNonSamplerBindings),
+		MaxNonSamplerBindings:                        uint32(nativeLimits.maxNonSamplerBindings),
+		MaxBindingArrayElementsPerShaderStage:        uint32(nativeLimits.maxBindingArrayElementsPerShaderStage),
+		MaxBindingArraySamplerElementsPerShaderStage: uint32(nativeLimits.maxBindingArraySamplerElementsPerShaderStage),
 	}
+}
+
+// newNativeLimitsChain allocates a WGPUNativeLimits with the sType set and every
+// limit undefined. wgpu-native ignores the chain without the sType. The caller frees it.
+func newNativeLimitsChain() *C.WGPUNativeLimits {
+	nativeLimits := callocOne[C.WGPUNativeLimits]()
+	nativeLimits.chain.next = nil
+	nativeLimits.chain.sType = C.WGPUSType_NativeLimits
+	nativeLimits.maxNonSamplerBindings = C.WGPU_LIMIT_U32_UNDEFINED
+	nativeLimits.maxBindingArrayElementsPerShaderStage = C.WGPU_LIMIT_U32_UNDEFINED
+	nativeLimits.maxBindingArraySamplerElementsPerShaderStage = C.WGPU_LIMIT_U32_UNDEFINED
+	return nativeLimits
 }
 
 func (g *Adapter) GetInfo() AdapterInfo {
@@ -115,13 +129,13 @@ func gowebgpu_request_device_callback_go(status C.WGPURequestDeviceStatus, devic
 }
 
 //export gowebgpu_device_lost_callback_go
-func gowebgpu_device_lost_callback_go(reason C.WGPUDeviceLostReason, message *C.char, userdata unsafe.Pointer) {
+func gowebgpu_device_lost_callback_go(reason C.WGPUDeviceLostReason, message C.WGPUStringView, userdata unsafe.Pointer) {
 	handle := lookupHandle(userdata)
 	defer handle.Delete()
 
 	cb, ok := handle.Value().(DeviceLostCallback)
 	if ok {
-		cb(DeviceLostReason(reason), C.GoString(message))
+		cb(DeviceLostReason(reason), C.GoStringN(message.data, C.int(message.length)))
 	}
 }
 
@@ -129,11 +143,12 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 	var desc *C.WGPUDeviceDescriptor = nil
 
 	if descriptor != nil {
-		desc = &C.WGPUDeviceDescriptor{}
+		desc = (*C.WGPUDeviceDescriptor)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPUDeviceDescriptor{}))))
+		defer C.free(unsafe.Pointer(desc))
 
 		if descriptor.Label != "" {
 			label := C.CString(descriptor.Label)
-			defer C.free(unsafe.Pointer(label))
+			defer free(label)
 
 			desc.label.data = label
 			desc.label.length = C.WGPU_STRLEN
@@ -141,21 +156,22 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 
 		requiredFeatureCount := len(descriptor.RequiredFeatures)
 		if requiredFeatureCount != 0 {
-			requiredFeatures := C.calloc(C.size_t(requiredFeatureCount), C.size_t(unsafe.Sizeof(C.WGPUFeatureName(0))))
-			defer C.free(requiredFeatures)
+			requiredFeatures, requiredFeaturesSlice := callocSlice[C.WGPUFeatureName](requiredFeatureCount)
+			defer free(requiredFeatures)
 
-			requiredFeaturesSlice := unsafe.Slice((*FeatureName)(requiredFeatures), requiredFeatureCount)
-			copy(requiredFeaturesSlice, descriptor.RequiredFeatures)
+			for idx, feature := range descriptor.RequiredFeatures {
+				requiredFeaturesSlice[idx] = C.WGPUFeatureName(feature)
+			}
 
-			desc.requiredFeatures = (*C.WGPUFeatureName)(requiredFeatures)
+			desc.requiredFeatures = requiredFeatures
 			desc.requiredFeatureCount = C.size_t(requiredFeatureCount)
 		}
 
 		if descriptor.RequiredLimits != nil {
 			l := descriptor.RequiredLimits
 
-			requiredLimits := (*C.WGPULimits)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPULimits{}))))
-			defer C.free(unsafe.Pointer(requiredLimits))
+			requiredLimits := callocOne[C.WGPULimits]()
+			defer free(requiredLimits)
 
 			*requiredLimits = C.WGPULimits{
 				maxTextureDimension1D:                     C.uint32_t(l.MaxTextureDimension1D),
@@ -192,12 +208,12 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 			}
 			desc.requiredLimits = requiredLimits
 
-			nativeLimits := (*C.WGPUNativeLimits)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPUNativeLimits{}))))
-			defer C.free(unsafe.Pointer(nativeLimits))
+			nativeLimits := newNativeLimitsChain()
+			defer free(nativeLimits)
 
-			nativeLimits.chain.next = nil
-			nativeLimits.chain.sType = C.WGPUSType_NativeLimits
 			nativeLimits.maxNonSamplerBindings = C.uint32_t(l.MaxNonSamplerBindings)
+			nativeLimits.maxBindingArrayElementsPerShaderStage = C.uint32_t(l.MaxBindingArrayElementsPerShaderStage)
+			nativeLimits.maxBindingArraySamplerElementsPerShaderStage = C.uint32_t(l.MaxBindingArraySamplerElementsPerShaderStage)
 
 			desc.requiredLimits.nextInChain = (*C.WGPUChainedStruct)(unsafe.Pointer(nativeLimits))
 		}
@@ -206,20 +222,21 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 			handle := newHandle(descriptor.DeviceLostCallback)
 
 			desc.deviceLostCallbackInfo = C.WGPUDeviceLostCallbackInfo{
+				mode:      C.WGPUCallbackMode_AllowSpontaneous,
 				callback:  C.WGPUDeviceLostCallback(C.gowebgpu_device_lost_callback_c),
 				userdata1: handle.ToPointer(),
 			}
 		}
 
 		if descriptor.TracePath != "" {
-			deviceExtras := (*C.WGPUDeviceExtras)(C.calloc(1, C.size_t(unsafe.Sizeof(C.WGPUDeviceExtras{}))))
-			defer C.free(unsafe.Pointer(deviceExtras))
+			deviceExtras := callocOne[C.WGPUDeviceExtras]()
+			defer free(deviceExtras)
 
 			deviceExtras.chain.next = nil
 			deviceExtras.chain.sType = C.WGPUSType_DeviceExtras
 
 			tracePath := C.CString(descriptor.TracePath)
-			defer C.free(unsafe.Pointer(tracePath))
+			defer free(tracePath)
 
 			deviceExtras.tracePath.data = tracePath
 			deviceExtras.tracePath.length = C.WGPU_STRLEN
@@ -237,6 +254,7 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 	}
 	handle := newHandle(cb)
 	C.wgpuAdapterRequestDevice(g.ref, desc, C.WGPURequestDeviceCallbackInfo{
+		mode:      C.WGPUCallbackMode_AllowSpontaneous,
 		callback:  C.WGPURequestDeviceCallback(C.gowebgpu_request_device_callback_c),
 		userdata1: handle.ToPointer(),
 	})
