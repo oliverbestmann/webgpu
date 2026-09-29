@@ -71,8 +71,59 @@ func (g *DeviceDescriptor) toJS() any {
 	result := make(map[string]any)
 	result["label"] = g.Label
 	result["requiredFeatures"] = mapSlice(g.RequiredFeatures, func(f FeatureName) any { return f.String() })
-	// result["requiredLimits"] = // TODO(kai): convert requiredLimits to JS
+	if g.RequiredLimits != nil {
+		result["requiredLimits"] = requiredLimitsToJS(g.RequiredLimits)
+	}
 	return result
+}
+
+// requiredLimitsToJS maps the wgpu Limits struct onto the web GPURequiredLimits
+// dictionary. Values at their undefined sentinel are omitted entirely, since
+// the browser rejects dictionary members whose value is undefined.
+func requiredLimitsToJS(l *Limits) any {
+	r := make(map[string]any)
+	setU32 := func(key string, v uint32) {
+		if v != LimitU32Undefined {
+			r[key] = v
+		}
+	}
+	setU64 := func(key string, v uint64) {
+		if v != LimitU64Undefined {
+			r[key] = v
+		}
+	}
+	setU32("maxTextureDimension1D", l.MaxTextureDimension1D)
+	setU32("maxTextureDimension2D", l.MaxTextureDimension2D)
+	setU32("maxTextureDimension3D", l.MaxTextureDimension3D)
+	setU32("maxTextureArrayLayers", l.MaxTextureArrayLayers)
+	setU32("maxBindGroups", l.MaxBindGroups)
+	setU32("maxBindingsPerBindGroup", l.MaxBindingsPerBindGroup)
+	setU32("maxDynamicUniformBuffersPerPipelineLayout", l.MaxDynamicUniformBuffersPerPipelineLayout)
+	setU32("maxDynamicStorageBuffersPerPipelineLayout", l.MaxDynamicStorageBuffersPerPipelineLayout)
+	setU32("maxSampledTexturesPerShaderStage", l.MaxSampledTexturesPerShaderStage)
+	setU32("maxSamplersPerShaderStage", l.MaxSamplersPerShaderStage)
+	setU32("maxStorageBuffersPerShaderStage", l.MaxStorageBuffersPerShaderStage)
+	setU32("maxStorageTexturesPerShaderStage", l.MaxStorageTexturesPerShaderStage)
+	setU32("maxUniformBuffersPerShaderStage", l.MaxUniformBuffersPerShaderStage)
+	setU64("maxUniformBufferBindingSize", l.MaxUniformBufferBindingSize)
+	setU64("maxStorageBufferBindingSize", l.MaxStorageBufferBindingSize)
+	setU32("minUniformBufferOffsetAlignment", l.MinUniformBufferOffsetAlignment)
+	setU32("minStorageBufferOffsetAlignment", l.MinStorageBufferOffsetAlignment)
+	setU32("maxVertexBuffers", l.MaxVertexBuffers)
+	setU64("maxBufferSize", l.MaxBufferSize)
+	setU32("maxVertexAttributes", l.MaxVertexAttributes)
+	setU32("maxVertexBufferArrayStride", l.MaxVertexBufferArrayStride)
+	setU32("maxInterStageShaderComponents", l.MaxInterStageShaderComponents)
+	setU32("maxInterStageShaderVariables", l.MaxInterStageShaderVariables)
+	setU32("maxColorAttachments", l.MaxColorAttachments)
+	setU32("maxColorAttachmentBytesPerSample", l.MaxColorAttachmentBytesPerSample)
+	setU32("maxComputeWorkgroupStorageSize", l.MaxComputeWorkgroupStorageSize)
+	setU32("maxComputeInvocationsPerWorkgroup", l.MaxComputeInvocationsPerWorkgroup)
+	setU32("maxComputeWorkgroupSizeX", l.MaxComputeWorkgroupSizeX)
+	setU32("maxComputeWorkgroupSizeY", l.MaxComputeWorkgroupSizeY)
+	setU32("maxComputeWorkgroupSizeZ", l.MaxComputeWorkgroupSizeZ)
+	setU32("maxComputeWorkgroupsPerDimension", l.MaxComputeWorkgroupsPerDimension)
+	return r
 }
 
 func (g *SurfaceConfiguration) toJS() any {

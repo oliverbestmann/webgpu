@@ -21,6 +21,19 @@ func (g *RenderPassEncoder) SetScissorRect(x, y, width, height uint32) {
 	g.jsValue.Call("setScissorRect", params...)
 }
 
+// SetViewport as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpurenderpassencoder-setviewport
+func (g *RenderPassEncoder) SetViewport(x, y, width, height, minDepth, maxDepth float32) {
+	params := make([]any, 6)
+	params[0] = x
+	params[1] = y
+	params[2] = width
+	params[3] = height
+	params[4] = minDepth
+	params[5] = maxDepth
+	g.jsValue.Call("setViewport", params...)
+}
+
 // SetStencilReference as described:
 // https://gpuweb.github.io/gpuweb/#dom-gpurenderpassencoder-setstencilreference
 func (g *RenderPassEncoder) SetStencilReference(ref uint32) {
@@ -93,6 +106,24 @@ func (g *RenderPassEncoder) DrawIndexed(indexCount uint32, instanceCount uint32,
 	params[3] = baseVertex
 	params[4] = firstInstance
 	g.jsValue.Call("drawIndexed", params...)
+}
+
+// DrawIndexedIndirect as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpurendercommandsmixin-drawindexedindirect
+func (g *RenderPassEncoder) DrawIndexedIndirect(indirectBuffer *Buffer, indirectOffset uint64) {
+	params := make([]any, 2)
+	params[0] = pointerToJS(indirectBuffer)
+	params[1] = uint64ToJS(indirectOffset)
+	g.jsValue.Call("drawIndexedIndirect", params...)
+}
+
+// DrawIndirect as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpurendercommandsmixin-drawindirect
+func (g *RenderPassEncoder) DrawIndirect(indirectBuffer *Buffer, indirectOffset uint64) {
+	params := make([]any, 2)
+	params[0] = pointerToJS(indirectBuffer)
+	params[1] = uint64ToJS(indirectOffset)
+	g.jsValue.Call("drawIndirect", params...)
 }
 
 // TryEnd as described:
