@@ -7,7 +7,7 @@ import (
 	"log"
 	"syscall/js"
 
-	"github.com/oliverbestmann/webgpu/jsx"
+	"github.com/Carmen-Shannon/webgpu/jsx"
 )
 
 func CreateInstance(descriptor *InstanceDescriptor) *Instance {

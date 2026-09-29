@@ -6,14 +6,11 @@ import (
 	"errors"
 	"runtime"
 	"strings"
+	"unsafe"
 )
 
 // #include "gen_wgpu_wrappers.h"
 import "C"
-
-import (
-	"unsafe"
-)
 
 var allocErrorCallbackValue = makeTypedPool[errorCallback]()
 
