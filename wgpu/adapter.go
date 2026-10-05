@@ -10,6 +10,12 @@ package wgpu
 extern void gowebgpu_request_device_callback_c(WGPURequestDeviceStatus status, WGPUDevice device, char const *message, void *userdata);
 extern void gowebgpu_device_lost_callback_c(WGPUDevice const * device, WGPUDeviceLostReason reason, WGPUStringView message, void * userdata1, void * userdata2);
 
+// wgpuAdapterInfoFreeMembers takes the struct by value; calling it from C keeps
+// that copy off the Go stack.
+static inline void gowebgpu_adapter_info_free_members(WGPUAdapterInfo * info) {
+  wgpuAdapterInfoFreeMembers(*info);
+}
+
 */
 import "C"
 import (
@@ -93,9 +99,14 @@ func newNativeLimitsChain() *C.WGPUNativeLimits {
 }
 
 func (g *Adapter) GetInfo() AdapterInfo {
-	var info C.WGPUAdapterInfo
+	// wgpu-native returns an empty string as a dangling pointer (0x1). The
+	// struct lives in C memory, because the Go runtime aborts on such a pointer
+	// when it copies a goroutine stack that holds one.
+	info := callocOne[C.WGPUAdapterInfo]()
+	defer free(info)
 
-	C.wgpuAdapterGetInfo(g.ref, &info)
+	C.wgpuAdapterGetInfo(g.ref, info)
+	defer C.gowebgpu_adapter_info_free_members(info)
 
 	return AdapterInfo{
 		Vendor:       C.GoStringN(info.vendor.data, C.int(info.vendor.length)),
