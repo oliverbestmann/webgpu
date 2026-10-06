@@ -61,6 +61,7 @@ jobs:
           export WGPU_FORCE_FALLBACK_ADAPTER=1
           export WGPU_LOG_LEVEL=TRACE
           go test ./...
+        shell: bash
 
       - name: Run examples
         if: ${{ matrix.run_examples }}
