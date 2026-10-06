@@ -71,7 +71,9 @@ func (g *DeviceDescriptor) toJS() any {
 	result := make(map[string]any)
 	result["label"] = g.Label
 	result["requiredFeatures"] = mapSlice(g.RequiredFeatures, func(f FeatureName) any { return f.String() })
-	// result["requiredLimits"] = // TODO(kai): convert requiredLimits to JS
+	if g.RequiredLimits != nil {
+		result["requiredLimits"] = g.RequiredLimits.toJS()
+	}
 	return result
 }
 
@@ -267,6 +269,54 @@ func (g *ProgrammableStageDescriptor) toJS() any {
 		"module":     pointerToJS(g.Module),
 		"entryPoint": g.EntryPoint,
 	}
+}
+
+// toJS converts the limits to a JS GPUSupportedLimits-style object,
+// only including the limits that are not undefined.
+func (g *Limits) toJS() map[string]any {
+	result := make(map[string]any)
+	u32 := func(name string, v uint32) {
+		if v != LimitU32Undefined {
+			result[name] = v
+		}
+	}
+	u64 := func(name string, v uint64) {
+		if v != LimitU64Undefined {
+			result[name] = v
+		}
+	}
+	u32("maxTextureDimension1D", g.MaxTextureDimension1D)
+	u32("maxTextureDimension2D", g.MaxTextureDimension2D)
+	u32("maxTextureDimension3D", g.MaxTextureDimension3D)
+	u32("maxTextureArrayLayers", g.MaxTextureArrayLayers)
+	u32("maxBindGroups", g.MaxBindGroups)
+	u32("maxBindingsPerBindGroup", g.MaxBindingsPerBindGroup)
+	u32("maxDynamicUniformBuffersPerPipelineLayout", g.MaxDynamicUniformBuffersPerPipelineLayout)
+	u32("maxDynamicStorageBuffersPerPipelineLayout", g.MaxDynamicStorageBuffersPerPipelineLayout)
+	u32("maxSampledTexturesPerShaderStage", g.MaxSampledTexturesPerShaderStage)
+	u32("maxSamplersPerShaderStage", g.MaxSamplersPerShaderStage)
+	u32("maxStorageBuffersPerShaderStage", g.MaxStorageBuffersPerShaderStage)
+	u32("maxStorageTexturesPerShaderStage", g.MaxStorageTexturesPerShaderStage)
+	u32("maxUniformBuffersPerShaderStage", g.MaxUniformBuffersPerShaderStage)
+	u64("maxUniformBufferBindingSize", g.MaxUniformBufferBindingSize)
+	u64("maxStorageBufferBindingSize", g.MaxStorageBufferBindingSize)
+	u32("minUniformBufferOffsetAlignment", g.MinUniformBufferOffsetAlignment)
+	u32("minStorageBufferOffsetAlignment", g.MinStorageBufferOffsetAlignment)
+	u32("maxVertexBuffers", g.MaxVertexBuffers)
+	u64("maxBufferSize", g.MaxBufferSize)
+	u32("maxVertexAttributes", g.MaxVertexAttributes)
+	u32("maxVertexBufferArrayStride", g.MaxVertexBufferArrayStride)
+	u32("maxInterStageShaderVariables", g.MaxInterStageShaderVariables)
+	u32("maxColorAttachments", g.MaxColorAttachments)
+	u32("maxColorAttachmentBytesPerSample", g.MaxColorAttachmentBytesPerSample)
+	u32("maxComputeWorkgroupStorageSize", g.MaxComputeWorkgroupStorageSize)
+	u32("maxComputeInvocationsPerWorkgroup", g.MaxComputeInvocationsPerWorkgroup)
+	u32("maxComputeWorkgroupSizeX", g.MaxComputeWorkgroupSizeX)
+	u32("maxComputeWorkgroupSizeY", g.MaxComputeWorkgroupSizeY)
+	u32("maxComputeWorkgroupSizeZ", g.MaxComputeWorkgroupSizeZ)
+	u32("maxComputeWorkgroupsPerDimension", g.MaxComputeWorkgroupsPerDimension)
+	u32("maxImmediateSize", g.MaxImmediateSize)
+	return result
 }
 
 func limitsFromJS(j js.Value) Limits {
