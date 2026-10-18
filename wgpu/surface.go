@@ -14,32 +14,13 @@ import (
 )
 
 func (g *Surface) GetCapabilities(adapter *Adapter) (ret SurfaceCapabilities) {
+	// wgpu-native allocates the arrays on every call (NULL when empty), they must
+	// be freed with wgpuSurfaceCapabilitiesFreeMembers.
 	var caps C.WGPUSurfaceCapabilities
-	C.wgpuSurfaceGetCapabilities(g.ref, adapter.ref, &caps)
-
-	if caps.alphaModeCount == 0 && caps.formatCount == 0 && caps.presentModeCount == 0 {
+	if C.wgpuSurfaceGetCapabilities(g.ref, adapter.ref, &caps) != C.WGPUStatus_Success {
 		return
 	}
-	if caps.formatCount > 0 {
-		formats, formatsSlice := callocSlice[C.WGPUTextureFormat](int(caps.formatCount))
-		defer free(formats)
-		caps.formats = formats
-		_ = formatsSlice
-	}
-	if caps.presentModeCount > 0 {
-		presentModes, presentModesSlice := callocSlice[C.WGPUPresentMode](int(caps.presentModeCount))
-		defer free(presentModes)
-		caps.presentModes = presentModes
-		_ = presentModesSlice
-	}
-	if caps.alphaModeCount > 0 {
-		alphaModes, alphaModesSlice := callocSlice[C.WGPUCompositeAlphaMode](int(caps.alphaModeCount))
-		defer free(alphaModes)
-		caps.alphaModes = alphaModes
-		_ = alphaModesSlice
-	}
-
-	C.wgpuSurfaceGetCapabilities(g.ref, adapter.ref, &caps)
+	defer C.wgpuSurfaceCapabilitiesFreeMembers(caps)
 
 	if caps.formatCount > 0 {
 		formatsTmp := unsafe.Slice((*TextureFormat)(caps.formats), caps.formatCount)
