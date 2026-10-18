@@ -57,6 +57,12 @@ func (g *ComputePassEncoder) DispatchWorkgroups(workgroupCountX, workgroupCountY
 	g.jsValue.Call("dispatchWorkgroups", params...)
 }
 
+// DispatchWorkgroupsIndirect as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpucomputepassencoder-dispatchworkgroupsindirect
+func (g *ComputePassEncoder) DispatchWorkgroupsIndirect(indirectBuffer *Buffer, indirectOffset uint64) {
+	g.jsValue.Call("dispatchWorkgroupsIndirect", pointerToJS(indirectBuffer), indirectOffset)
+}
+
 // InsertDebugMarker as described:
 // https://gpuweb.github.io/gpuweb/#dom-gpudebugcommandsmixin-insertdebugmarker
 func (g *ComputePassEncoder) InsertDebugMarker(markerLabel string) {
