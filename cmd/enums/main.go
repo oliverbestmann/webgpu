@@ -84,7 +84,7 @@ func main() {
 
 	var enums = Enums{}
 
-	re := regexp.MustCompile("(?m)^(static const .*)?\\s*WGPU([A-Za-z0-9]+)_([A-Za-z0-9]+) = 0x([0-9A-F]+)")
+	re := regexp.MustCompile("(?m)^(static const .*)?\\s*WGPU([A-Za-z0-9]+)_([A-Za-z0-9_]+) = 0x([0-9A-F]+)")
 
 	for _, match := range re.FindAllStringSubmatch(in, -1) {
 		goType := "uint32"
@@ -157,7 +157,12 @@ func main() {
 				}
 				b.WriteRune(r)
 			}
-			fmt.Fprintf(w, "return \"%s\"\n", b.String())
+			jsName := b.String()
+			// underscores separate digits, JS keeps them as hyphens: unorm10-10-10-2
+			if suffix := strings.TrimPrefix(v.Enum, e.Name); strings.Contains(suffix, "_") {
+				jsName = strings.ToLower(strings.ReplaceAll(suffix, "_", "-"))
+			}
+			fmt.Fprintf(w, "return \"%s\"\n", jsName)
 		}
 		if e.Name == "ErrorType" {
 			fmt.Fprintf(w, "default:\n")
@@ -182,6 +187,12 @@ func generateVertexFormatSize(w io.Writer, enum TypedefEnum) {
 	fmt.Fprintln(w, "switch v {")
 
 	for _, enumItem := range enum.Enums {
+		// packed format, the regexp below would read the first component only
+		if strings.HasSuffix(enumItem.Enum, "10_10_10_2") {
+			fmt.Fprintf(w, "case %s: return 4\n", enumItem.Enum)
+			continue
+		}
+
 		match := re.FindStringSubmatch(enumItem.Enum)
 		if match == nil {
 			panic("no match in " + enumItem.Enum)

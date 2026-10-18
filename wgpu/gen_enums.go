@@ -543,6 +543,40 @@ func (v Dx12SwapchainKind) String() string {
 	}
 }
 
+type DxcMaxShaderModel uint32
+
+const DxcMaxShaderModelV6_0 DxcMaxShaderModel = 0x00000000
+const DxcMaxShaderModelV6_1 DxcMaxShaderModel = 0x00000001
+const DxcMaxShaderModelV6_2 DxcMaxShaderModel = 0x00000002
+const DxcMaxShaderModelV6_3 DxcMaxShaderModel = 0x00000003
+const DxcMaxShaderModelV6_4 DxcMaxShaderModel = 0x00000004
+const DxcMaxShaderModelV6_5 DxcMaxShaderModel = 0x00000005
+const DxcMaxShaderModelV6_6 DxcMaxShaderModel = 0x00000006
+const DxcMaxShaderModelV6_7 DxcMaxShaderModel = 0x00000007
+
+func (v DxcMaxShaderModel) String() string {
+	switch v {
+	case DxcMaxShaderModelV6_0:
+		return "v6-0"
+	case DxcMaxShaderModelV6_1:
+		return "v6-1"
+	case DxcMaxShaderModelV6_2:
+		return "v6-2"
+	case DxcMaxShaderModelV6_3:
+		return "v6-3"
+	case DxcMaxShaderModelV6_4:
+		return "v6-4"
+	case DxcMaxShaderModelV6_5:
+		return "v6-5"
+	case DxcMaxShaderModelV6_6:
+		return "v6-6"
+	case DxcMaxShaderModelV6_7:
+		return "v6-7"
+	default:
+		return ""
+	}
+}
+
 type ErrorFilter uint32
 
 const ErrorFilterValidation ErrorFilter = 0x00000001
@@ -2105,6 +2139,7 @@ const VertexFormatSint32 VertexFormat = 0x00000024
 const VertexFormatSint32x2 VertexFormat = 0x00000025
 const VertexFormatSint32x3 VertexFormat = 0x00000026
 const VertexFormatSint32x4 VertexFormat = 0x00000027
+const VertexFormatUnorm10_10_10_2 VertexFormat = 0x00000028
 const VertexFormatUnorm8x4BGRA VertexFormat = 0x00000029
 
 func (v VertexFormat) ByteSize() uint32 {
@@ -2187,6 +2222,8 @@ func (v VertexFormat) ByteSize() uint32 {
 		return 12
 	case VertexFormatSint32x4:
 		return 16
+	case VertexFormatUnorm10_10_10_2:
+		return 4
 	case VertexFormatUnorm8x4BGRA:
 		return 4
 	default:
@@ -2273,6 +2310,8 @@ func (v VertexFormat) String() string {
 		return "sint32x3"
 	case VertexFormatSint32x4:
 		return "sint32x4"
+	case VertexFormatUnorm10_10_10_2:
+		return "unorm10-10-10-2"
 	case VertexFormatUnorm8x4BGRA:
 		return "unorm8x4bgra"
 	default:
