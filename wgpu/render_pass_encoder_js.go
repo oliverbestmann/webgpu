@@ -95,6 +95,62 @@ func (g *RenderPassEncoder) DrawIndexed(indexCount uint32, instanceCount uint32,
 	g.jsValue.Call("drawIndexed", params...)
 }
 
+// DrawIndirect as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpurendercommandsmixin-drawindirect
+func (g *RenderPassEncoder) DrawIndirect(indirectBuffer *Buffer, indirectOffset uint64) {
+	g.jsValue.Call("drawIndirect", pointerToJS(indirectBuffer), indirectOffset)
+}
+
+// DrawIndexedIndirect as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpurendercommandsmixin-drawindexedindirect
+func (g *RenderPassEncoder) DrawIndexedIndirect(indirectBuffer *Buffer, indirectOffset uint64) {
+	g.jsValue.Call("drawIndexedIndirect", pointerToJS(indirectBuffer), indirectOffset)
+}
+
+// SetViewport as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpurenderpassencoder-setviewport
+func (g *RenderPassEncoder) SetViewport(x, y, width, height, minDepth, maxDepth float32) {
+	g.jsValue.Call("setViewport", x, y, width, height, minDepth, maxDepth)
+}
+
+// BeginOcclusionQuery as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpurenderpassencoder-beginocclusionquery
+func (g *RenderPassEncoder) BeginOcclusionQuery(queryIndex uint32) {
+	g.jsValue.Call("beginOcclusionQuery", queryIndex)
+}
+
+// EndOcclusionQuery as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpurenderpassencoder-endocclusionquery
+func (g *RenderPassEncoder) EndOcclusionQuery() {
+	g.jsValue.Call("endOcclusionQuery")
+}
+
+// ExecuteBundles as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpurenderpassencoder-executebundles
+func (g *RenderPassEncoder) ExecuteBundles(bundles ...*RenderBundle) {
+	g.jsValue.Call("executeBundles", mapSlice(bundles, func(bundle *RenderBundle) any {
+		return pointerToJS(bundle)
+	}))
+}
+
+// InsertDebugMarker as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpudebugcommandsmixin-insertdebugmarker
+func (g *RenderPassEncoder) InsertDebugMarker(markerLabel string) {
+	g.jsValue.Call("insertDebugMarker", markerLabel)
+}
+
+// PopDebugGroup as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpudebugcommandsmixin-popdebuggroup
+func (g *RenderPassEncoder) PopDebugGroup() {
+	g.jsValue.Call("popDebugGroup")
+}
+
+// PushDebugGroup as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpudebugcommandsmixin-pushdebuggroup
+func (g *RenderPassEncoder) PushDebugGroup(groupLabel string) {
+	g.jsValue.Call("pushDebugGroup", groupLabel)
+}
+
 // TryEnd as described:
 // https://gpuweb.github.io/gpuweb/#dom-gpurenderpassencoder-end
 func (g *RenderPassEncoder) TryEnd() (err error) {
