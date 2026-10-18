@@ -16,6 +16,10 @@ func (p *Buffer) Destroy() {
 }
 
 func (p *Buffer) GetMappedRange(offset, size uint) []byte {
+	if size == WholeMapSize {
+		size = uint(p.GetSize()) - offset
+	}
+
 	buf := C.wgpuBufferGetMappedRange(p.ref, C.size_t(offset), C.size_t(size))
 	return unsafe.Slice((*byte)(buf), size)
 }
