@@ -21,7 +21,7 @@ func (g *RenderBundleEncoder) Draw(vertexCount, instanceCount, firstVertex, firs
 	)
 }
 
-func (g *RenderBundleEncoder) DrawIndexed(indexCount, instanceCount, firstIndex, baseVertex, firstInstance uint32) {
+func (g *RenderBundleEncoder) DrawIndexed(indexCount uint32, instanceCount uint32, firstIndex uint32, baseVertex int32, firstInstance uint32) {
 	C.wgpuRenderBundleEncoderDrawIndexed(
 		g.ref,
 		C.uint32_t(indexCount),
