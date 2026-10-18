@@ -45,6 +45,27 @@ func (g *Adapter) GetLimits() Limits {
 	return limitsFromJS(g.jsValue.Get("limits"))
 }
 
+// GetFeatures as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpuadapter-features
+func (g *Adapter) GetFeatures() []FeatureName {
+	return featuresFromJS(g.jsValue.Get("features"))
+}
+
+// featuresFromJS converts a GPUSupportedFeatures set, skipping features this
+// package does not know.
+func featuresFromJS(set js.Value) []FeatureName {
+	names := js.Global().Get("Array").Call("from", set)
+
+	features := make([]FeatureName, 0, names.Length())
+	for i := range names.Length() {
+		if feature, ok := enumFromJS[FeatureName](names.Index(i).String()); ok {
+			features = append(features, feature)
+		}
+	}
+
+	return features
+}
+
 func (g *Adapter) HasFeature(name FeatureName) bool {
 	hasFeature := g.jsValue.Get("features").Call("has", name.String())
 	return hasFeature.Bool()

@@ -152,11 +152,6 @@ var knownAPIDifferences = map[string]string{
 	// Only in WebGPU.
 	"type BindGroupLayoutEntry":         "js: external textures",
 	"type ExternalTextureBindingLayout": "js: external textures",
-
-	// Gaps in the JS port.
-	"func (*Adapter) GetFeatures": "missing in js",
-	"func (*Device) GetFeatures":  "missing in js",
-	"func (*Device) HasFeature":   "missing in js",
 }
 
 // TestNativeAndJSAPIMatch compares the exported declarations of the native and

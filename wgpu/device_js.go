@@ -113,6 +113,16 @@ func (g *Device) TryCreateRenderBundleEncoder(descriptor *RenderBundleEncoderDes
 	return &RenderBundleEncoder{jsValue: jsValue}, nil
 }
 
+// GetFeatures as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpudevice-features
+func (g *Device) GetFeatures() []FeatureName {
+	return featuresFromJS(g.jsValue.Get("features"))
+}
+
+func (g *Device) HasFeature(feature FeatureName) bool {
+	return g.jsValue.Get("features").Call("has", feature.String()).Bool()
+}
+
 func (g *Device) GetLimits() Limits {
 	return limitsFromJS(g.jsValue.Get("limits"))
 }
