@@ -21,7 +21,7 @@ func (v Error) Unwrap() error {
 
 func panicIf(err error, context string) {
 	if err != nil {
-		panic(err)
+		panic(wrap(err, context))
 	}
 }
 
