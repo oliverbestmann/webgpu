@@ -6,6 +6,7 @@ package wgpu
 #cgo CFLAGS: -Werror=incompatible-pointer-types
 
 #include <wgpu.h>
+#include "callbacks.h"
 
 // wgpu-native passes an empty message as a dangling pointer (0x1) with length
 // 0. The Go callbacks take the view by value, so it lands on the Go stack, and

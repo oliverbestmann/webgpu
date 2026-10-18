@@ -4,7 +4,7 @@ package wgpu
 
 /*
 #include "gen_wgpu_wrappers.h"
-extern void gowebgpu_queue_work_done_callback_c(WGPUQueueWorkDoneStatus status, WGPUStringView message, void * userdata1, void * userdata2);
+#include "callbacks.h"
 */
 import "C"
 import (

@@ -4,7 +4,7 @@ package wgpu
 
 /*
 #include "gen_wgpu_wrappers.h"
-extern void gowebgpu_buffer_map_callback_c(WGPUMapAsyncStatus status, WGPUStringView message, void *userdata, void *userdata2);
+#include "callbacks.h"
 */
 import "C"
 import (

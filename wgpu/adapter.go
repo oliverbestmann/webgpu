@@ -7,8 +7,7 @@ package wgpu
 #include <stdlib.h>
 #include <wgpu.h>
 
-extern void gowebgpu_request_device_callback_c(WGPURequestDeviceStatus status, WGPUDevice device, char const *message, void *userdata);
-extern void gowebgpu_device_lost_callback_c(WGPUDevice const * device, WGPUDeviceLostReason reason, WGPUStringView message, void * userdata1, void * userdata2);
+#include "callbacks.h"
 
 // wgpuAdapterInfoFreeMembers takes the struct by value; calling it from C keeps
 // that copy off the Go stack.

@@ -7,7 +7,7 @@ package wgpu
 #include <stdlib.h>
 #include <wgpu.h>
 
-extern void gowebgpu_request_adapter_callback_c(WGPURequestAdapterStatus status, WGPUAdapter adapter, char const *message, void *userdata);
+#include "callbacks.h"
 
 */
 import "C"
