@@ -221,8 +221,6 @@ package wgpu
 #cgo nocallback wgpuRenderPipelineRelease
 #cgo noescape wgpuSamplerRelease
 #cgo nocallback wgpuSamplerRelease
-#cgo noescape wgpuSetLogCallback
-#cgo nocallback wgpuSetLogCallback
 #cgo noescape wgpuSetLogLevel
 #cgo nocallback wgpuSetLogLevel
 #cgo noescape wgpuTextureDestroy

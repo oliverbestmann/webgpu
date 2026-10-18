@@ -45,25 +45,43 @@ import (
 #cgo windows,386 CFLAGS: -I${SRCDIR}/lib/windows/386
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <wgpu.h>
+
+// The message is a WGPUStringView passed by value, and is not NUL-terminated
+// unless length is WGPU_STRLEN.
+static size_t logMessageLen(WGPUStringView msg) {
+	if (msg.data == NULL) return 0;
+	if (msg.length == WGPU_STRLEN) return strlen(msg.data);
+	return msg.length;
+}
 
 #ifdef __ANDROID__
 #include <android/log.h>
-void logCallback_cgo(WGPULogLevel level, char const *msg) {
+void logCallback_cgo(WGPULogLevel level, WGPUStringView msg, void *userdata) {
+	(void)userdata;
+	size_t len = logMessageLen(msg);
+	char *text = malloc(len + 1);
+	if (text == NULL) return;
+	if (len > 0) memcpy(text, msg.data, len);
+	text[len] = '\0';
 	switch (level) {
 	case WGPULogLevel_Error:
-		__android_log_write(ANDROID_LOG_ERROR, "GoLogWGPU", msg);
+		__android_log_write(ANDROID_LOG_ERROR, "GoLogWGPU", text);
 		break;
 	case WGPULogLevel_Warn:
-		__android_log_write(ANDROID_LOG_WARN, "GoLogWGPU", msg);
+		__android_log_write(ANDROID_LOG_WARN, "GoLogWGPU", text);
 		break;
 	default:
-		__android_log_write(ANDROID_LOG_INFO, "GoLogWGPU", msg);
+		__android_log_write(ANDROID_LOG_INFO, "GoLogWGPU", text);
 		break;
 	}
+	free(text);
 }
 #else
-void logCallback_cgo(WGPULogLevel level, char const *msg) {
+void logCallback_cgo(WGPULogLevel level, WGPUStringView msg, void *userdata) {
+	(void)userdata;
 	char const *level_str;
 	switch (level) {
 	case WGPULogLevel_Error:
@@ -84,16 +102,22 @@ void logCallback_cgo(WGPULogLevel level, char const *msg) {
 	default:
 		level_str = "Unknown Level";
 	}
-	fprintf(stderr, "[wgpu] [%s] %s\n", level_str, msg);
+	fprintf(stderr, "[wgpu] [%s] %.*s\n", level_str,
+		(int)logMessageLen(msg), msg.data == NULL ? "" : msg.data);
 }
 #endif
 
+// Registered from C, not from Go: a Go-side cast to WGPULogCallback would hide a
+// signature that no longer matches the header, and C type-checks it here.
+static void registerLogCallback(void) {
+	wgpuSetLogCallback(logCallback_cgo, NULL);
+}
 
 */
 import "C"
 
 func init() {
-	C.wgpuSetLogCallback(C.WGPULogCallback(C.logCallback_cgo), nil)
+	C.registerLogCallback()
 }
 
 func SetLogLevel(level LogLevel) {
