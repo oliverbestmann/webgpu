@@ -48,11 +48,10 @@ func (v TextureFormat) ByteSize() uint32 {
 		TextureFormatRGBA16Snorm,
 		TextureFormatRGBA16Uint,
 		TextureFormatRGBA16Sint,
-		TextureFormatRGBA16Float,
-		TextureFormatRGBA32Float:
+		TextureFormatRGBA16Float:
 		return 8
 
-	case TextureFormatRGBA32Uint, TextureFormatRGBA32Sint:
+	case TextureFormatRGBA32Float, TextureFormatRGBA32Uint, TextureFormatRGBA32Sint:
 		return 16
 
 	case TextureFormatStencil8:
