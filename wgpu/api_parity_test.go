@@ -154,12 +154,9 @@ var knownAPIDifferences = map[string]string{
 	"type ExternalTextureBindingLayout": "js: external textures",
 
 	// Gaps in the JS port.
-	"func (*Adapter) GetFeatures":  "missing in js",
-	"func (*Device) GetFeatures":   "missing in js",
-	"func (*Device) HasFeature":    "missing in js",
-	"func (*Texture) Destroy":      "missing in js",
-	"func (*Texture) GetDimension": "missing in js",
-	"func (*Texture) GetUsage":     "missing in js",
+	"func (*Adapter) GetFeatures": "missing in js",
+	"func (*Device) GetFeatures":  "missing in js",
+	"func (*Device) HasFeature":   "missing in js",
 }
 
 // TestNativeAndJSAPIMatch compares the exported declarations of the native and

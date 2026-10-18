@@ -20,6 +20,25 @@ func (g *Texture) GetFormat() TextureFormat {
 	panic(fmt.Sprintf("unknown texture format %q", jsFormat))
 }
 
+// Destroy as described:
+// https://gpuweb.github.io/gpuweb/#dom-gputexture-destroy
+func (g *Texture) Destroy() {
+	g.jsValue.Call("destroy")
+}
+
+// GetDimension as described:
+// https://gpuweb.github.io/gpuweb/#dom-gputexture-dimension
+func (g *Texture) GetDimension() TextureDimension {
+	dimension, _ := enumFromJS[TextureDimension](g.jsValue.Get("dimension").String())
+	return dimension
+}
+
+// GetUsage as described:
+// https://gpuweb.github.io/gpuweb/#dom-gputexture-usage
+func (g *Texture) GetUsage() TextureUsage {
+	return TextureUsage(g.jsValue.Get("usage").Int())
+}
+
 // GetDepthOrArrayLayers as described:
 // https://gpuweb.github.io/gpuweb/#dom-gputexture-depthorarraylayers
 func (g *Texture) GetDepthOrArrayLayers() uint32 {
