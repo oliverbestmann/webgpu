@@ -25,7 +25,7 @@ const (
 type Version uint32
 
 func (v Version) String() string {
-	return "0x" + strconv.FormatUint(uint64(v), 8)
+	return "0x" + strconv.FormatUint(uint64(v), 16)
 }
 
 type Limits struct {
