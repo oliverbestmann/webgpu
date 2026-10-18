@@ -213,27 +213,27 @@ func (p *RenderPassEncoder) SetImmediates(offset uint32, data []byte) {
 	)
 }
 
-func (p *RenderPassEncoder) MultiDrawIndirect(encoder *RenderPassEncoder, buffer Buffer, offset uint64, count uint32) {
+func (p *RenderPassEncoder) MultiDrawIndirect(buffer *Buffer, offset uint64, count uint32) {
 	C.wgpuRenderPassEncoderMultiDrawIndirect(
-		encoder.ref,
+		p.ref,
 		buffer.ref,
 		C.uint64_t(offset),
 		C.uint32_t(count),
 	)
 }
 
-func (p *RenderPassEncoder) MultiDrawIndexedIndirect(encoder *RenderPassEncoder, buffer Buffer, offset uint64, count uint32) {
+func (p *RenderPassEncoder) MultiDrawIndexedIndirect(buffer *Buffer, offset uint64, count uint32) {
 	C.wgpuRenderPassEncoderMultiDrawIndexedIndirect(
-		encoder.ref,
+		p.ref,
 		buffer.ref,
 		C.uint64_t(offset),
 		C.uint32_t(count),
 	)
 }
 
-func (p *RenderPassEncoder) MultiDrawIndirectCount(encoder *RenderPassEncoder, buffer Buffer, offset uint64, countBuffer Buffer, countBufferOffset uint64, maxCount uint32) {
+func (p *RenderPassEncoder) MultiDrawIndirectCount(buffer *Buffer, offset uint64, countBuffer *Buffer, countBufferOffset uint64, maxCount uint32) {
 	C.wgpuRenderPassEncoderMultiDrawIndirectCount(
-		encoder.ref,
+		p.ref,
 		buffer.ref,
 		C.uint64_t(offset),
 		countBuffer.ref,
@@ -242,9 +242,9 @@ func (p *RenderPassEncoder) MultiDrawIndirectCount(encoder *RenderPassEncoder, b
 	)
 }
 
-func (p *RenderPassEncoder) MultiDrawIndexedIndirectCount(encoder *RenderPassEncoder, buffer Buffer, offset uint64, countBuffer Buffer, countBufferOffset uint64, maxCount uint32) {
+func (p *RenderPassEncoder) MultiDrawIndexedIndirectCount(buffer *Buffer, offset uint64, countBuffer *Buffer, countBufferOffset uint64, maxCount uint32) {
 	C.wgpuRenderPassEncoderMultiDrawIndexedIndirectCount(
-		encoder.ref,
+		p.ref,
 		buffer.ref,
 		C.uint64_t(offset),
 		countBuffer.ref,
