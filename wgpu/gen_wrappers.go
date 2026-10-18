@@ -155,8 +155,16 @@ func (p *Queue) WriteTexture(destination *TexelCopyTextureInfo, data []byte, dat
 // This will also release the instance, so it must not be used afterwards
 func (p *RenderPassEncoder) End() { err := p.TryEnd(); panicIf(err, "RenderPassEncoder.End failed") }
 
-// NOTE: you should typically not call [Texture.Release] on the returned texture.
-// Instead, you should call [TextureView.Release] on any [TextureView] you create from it.
+// The caller owns the returned texture and must call [Texture.Release] on it
+// after [Surface.Present] and before acquiring the next texture, or when abandoning
+// the frame. Releasing it before Present, or after the next acquire, discards the
+// current frame.
+//
+// Unlike other objects, the texture is not released by the garbage collector, as
+// that could happen at any time. A [TextureView] does not keep its texture reachable,
+// so code that keeps only the view would lose the frame if the texture got collected
+// before Present.
+//
 // You need to check the status of the returned texture, or use SurfaceTexture.Get.
 func (g *Surface) GetCurrentTexture() SurfaceTexture {
 	r0, err := g.TryGetCurrentTexture()

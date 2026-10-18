@@ -152,12 +152,9 @@ func (s *State) Render() error {
 		time.Sleep(16 * time.Millisecond)
 		return nil
 	}
-
-	defer func() {
-		if nextTexture != nil {
-			nextTexture.Release()
-		}
-	}()
+	// The caller owns the surface texture. This deferred Release runs after
+	// Present below.
+	defer nextTexture.Release()
 
 	view, err := nextTexture.TryCreateView(nil)
 	if err != nil {
@@ -196,8 +193,6 @@ func (s *State) Render() error {
 
 	s.queue.Submit(cmdBuffer)
 	s.surface.Present()
-
-	nextTexture = nil
 
 	return nil
 }

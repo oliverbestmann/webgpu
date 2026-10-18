@@ -353,6 +353,9 @@ func (s *State) Render() error {
 		time.Sleep(16 * time.Millisecond)
 		return nil
 	}
+	// The caller owns the surface texture. This deferred Release runs after
+	// Present below.
+	defer nextTexture.Release()
 
 	view, err := nextTexture.TryCreateView(nil)
 	if err != nil {
