@@ -48,10 +48,6 @@ func (g *RenderBundleEncoder) DrawIndirect(indirectBuffer *Buffer, indirectOffse
 	)
 }
 
-type RenderBundleDescriptor struct {
-	Label string
-}
-
 func (g *RenderBundleEncoder) Finish(descriptor *RenderBundleDescriptor) *RenderBundle {
 	var desc *C.WGPURenderBundleDescriptor
 

@@ -258,6 +258,10 @@ type RenderBundleEncoderDescriptor struct {
 	StencilReadOnly    bool
 }
 
+type RenderBundleDescriptor struct {
+	Label string
+}
+
 type CommandEncoderDescriptor struct {
 	Label string
 }
