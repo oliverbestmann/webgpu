@@ -12,7 +12,7 @@ package wgpu
 */
 import "C"
 import (
-	"errors"
+	"fmt"
 	"unsafe"
 )
 
@@ -206,10 +206,12 @@ func (g *Instance) RequestAdapter(options *RequestAdapterOptions) (*Adapter, err
 
 	var status RequestAdapterStatus
 	var adapter *Adapter
+	var message string
 
-	var cb requestAdapterCb = func(s RequestAdapterStatus, a *Adapter, _ string) {
+	var cb requestAdapterCb = func(s RequestAdapterStatus, a *Adapter, m string) {
 		status = s
 		adapter = a
+		message = m
 	}
 	handle := newHandle(cb)
 	C.wgpuInstanceRequestAdapter(g.ref, opts, C.WGPURequestAdapterCallbackInfo{
@@ -219,7 +221,7 @@ func (g *Instance) RequestAdapter(options *RequestAdapterOptions) (*Adapter, err
 	})
 
 	if status != RequestAdapterStatusSuccess {
-		return nil, errors.New("failed to request adapter")
+		return nil, fmt.Errorf("failed to request adapter: %s: %s", status, message)
 	}
 	return adapter, nil
 }

@@ -22,7 +22,7 @@ static inline void gowebgpu_supported_features_free_members(WGPUSupportedFeature
 */
 import "C"
 import (
-	"errors"
+	"fmt"
 	"unsafe"
 )
 
@@ -268,10 +268,12 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 
 	var status RequestDeviceStatus
 	var device *Device
+	var message string
 
-	var cb requestDeviceCb = func(s RequestDeviceStatus, d *Device, _ string) {
+	var cb requestDeviceCb = func(s RequestDeviceStatus, d *Device, m string) {
 		status = s
 		device = d
+		message = m
 	}
 	handle := newHandle(cb)
 	C.wgpuAdapterRequestDevice(g.ref, desc, C.WGPURequestDeviceCallbackInfo{
@@ -281,7 +283,7 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 	})
 
 	if status != RequestDeviceStatusSuccess {
-		return nil, errors.New("failed to request device")
+		return nil, fmt.Errorf("failed to request device: %s: %s", status, message)
 	}
 
 	return device, nil
