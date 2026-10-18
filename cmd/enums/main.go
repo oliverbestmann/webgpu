@@ -3,6 +3,8 @@ package main
 import (
 	"bytes"
 	"cmp"
+	_ "embed"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"go/format"
@@ -13,6 +15,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"unicode"
 
 	"slices"
@@ -158,9 +161,8 @@ func main() {
 				b.WriteRune(r)
 			}
 			jsName := b.String()
-			// underscores separate digits, JS keeps them as hyphens: unorm10-10-10-2
-			if suffix := strings.TrimPrefix(v.Enum, e.Name); strings.Contains(suffix, "_") {
-				jsName = strings.ToLower(strings.ReplaceAll(suffix, "_", "-"))
+			if name, ok := specName(e.Name, strings.TrimPrefix(v.Enum, e.Name)); ok {
+				jsName = name
 			}
 			fmt.Fprintf(w, "return \"%s\"\n", jsName)
 		}
@@ -178,6 +180,38 @@ func main() {
 	out := mustv(os.Create(outputFile))
 	mustv(out.Write(fmtFile(w.Bytes())))
 	must(out.Close())
+}
+
+// webgpu_enums.json holds the enum values of the WebGPU spec, keyed by the IDL
+// enum name without the GPU prefix. Taken from the IDL index of
+// https://gpuweb.github.io/gpuweb/, update it when the headers gain values.
+//
+//go:embed webgpu_enums.json
+var specEnumsJSON []byte
+
+var specEnums = sync.OnceValue(func() map[string][]string {
+	var enums map[string][]string
+	must(json.Unmarshal(specEnumsJSON, &enums))
+	return enums
+})
+
+// specName finds the spec string of an enum value by comparing names without
+// case and separators: BC1RGBAUnorm matches "bc1-rgba-unorm".
+func specName(goType, name string) (string, bool) {
+	if goType == "CompositeAlphaMode" {
+		goType = "CanvasAlphaMode"
+	}
+
+	normalize := strings.NewReplacer("-", "", "_", "")
+	key := strings.ToLower(normalize.Replace(name))
+
+	for _, value := range specEnums()[goType] {
+		if normalize.Replace(value) == key {
+			return value, true
+		}
+	}
+
+	return "", false
 }
 
 func generateVertexFormatSize(w io.Writer, enum TypedefEnum) {

@@ -141,9 +141,9 @@ func (v BlendFactor) String() string {
 	case BlendFactorOneMinusSrc1:
 		return "one-minus-src1"
 	case BlendFactorSrc1Alpha:
-		return "src1alpha"
+		return "src1-alpha"
 	case BlendFactorOneMinusSrc1Alpha:
-		return "one-minus-src1alpha"
+		return "one-minus-src1-alpha"
 	default:
 		return ""
 	}
@@ -557,21 +557,21 @@ const DxcMaxShaderModelV6_7 DxcMaxShaderModel = 0x00000007
 func (v DxcMaxShaderModel) String() string {
 	switch v {
 	case DxcMaxShaderModelV6_0:
-		return "v6-0"
+		return "v60"
 	case DxcMaxShaderModelV6_1:
-		return "v6-1"
+		return "v61"
 	case DxcMaxShaderModelV6_2:
-		return "v6-2"
+		return "v62"
 	case DxcMaxShaderModelV6_3:
-		return "v6-3"
+		return "v63"
 	case DxcMaxShaderModelV6_4:
-		return "v6-4"
+		return "v64"
 	case DxcMaxShaderModelV6_5:
-		return "v6-5"
+		return "v65"
 	case DxcMaxShaderModelV6_6:
-		return "v6-6"
+		return "v66"
 	case DxcMaxShaderModelV6_7:
-		return "v6-7"
+		return "v67"
 	default:
 		return ""
 	}
@@ -725,13 +725,13 @@ func (v FeatureName) String() string {
 	case FeatureNameTextureCompressionBC:
 		return "texture-compression-bc"
 	case FeatureNameTextureCompressionBCSliced3D:
-		return "texture-compression-bc-sliced3d"
+		return "texture-compression-bc-sliced-3d"
 	case FeatureNameTextureCompressionETC2:
 		return "texture-compression-etc2"
 	case FeatureNameTextureCompressionASTC:
 		return "texture-compression-astc"
 	case FeatureNameTextureCompressionASTCSliced3D:
-		return "texture-compression-astc-sliced3d"
+		return "texture-compression-astc-sliced-3d"
 	case FeatureNameTimestampQuery:
 		return "timestamp-query"
 	case FeatureNameIndirectFirstInstance:
@@ -743,9 +743,9 @@ func (v FeatureName) String() string {
 	case FeatureNameBGRA8UnormStorage:
 		return "bgra8unorm-storage"
 	case FeatureNameFloat32Filterable:
-		return "float32filterable"
+		return "float32-filterable"
 	case FeatureNameFloat32Blendable:
-		return "float32blendable"
+		return "float32-blendable"
 	case FeatureNameClipDistances:
 		return "clip-distances"
 	case FeatureNameDualSourceBlending:
@@ -1881,109 +1881,109 @@ func (v TextureFormat) String() string {
 	case TextureFormatDepth32FloatStencil8:
 		return "depth32float-stencil8"
 	case TextureFormatBC1RGBAUnorm:
-		return "bc1rgba-unorm"
+		return "bc1-rgba-unorm"
 	case TextureFormatBC1RGBAUnormSrgb:
-		return "bc1rgba-unorm-srgb"
+		return "bc1-rgba-unorm-srgb"
 	case TextureFormatBC2RGBAUnorm:
-		return "bc2rgba-unorm"
+		return "bc2-rgba-unorm"
 	case TextureFormatBC2RGBAUnormSrgb:
-		return "bc2rgba-unorm-srgb"
+		return "bc2-rgba-unorm-srgb"
 	case TextureFormatBC3RGBAUnorm:
-		return "bc3rgba-unorm"
+		return "bc3-rgba-unorm"
 	case TextureFormatBC3RGBAUnormSrgb:
-		return "bc3rgba-unorm-srgb"
+		return "bc3-rgba-unorm-srgb"
 	case TextureFormatBC4RUnorm:
-		return "bc4r-unorm"
+		return "bc4-r-unorm"
 	case TextureFormatBC4RSnorm:
-		return "bc4r-snorm"
+		return "bc4-r-snorm"
 	case TextureFormatBC5RGUnorm:
-		return "bc5rg-unorm"
+		return "bc5-rg-unorm"
 	case TextureFormatBC5RGSnorm:
-		return "bc5rg-snorm"
+		return "bc5-rg-snorm"
 	case TextureFormatBC6HRGBUfloat:
-		return "bc6hrgb-ufloat"
+		return "bc6h-rgb-ufloat"
 	case TextureFormatBC6HRGBFloat:
-		return "bc6hrgb-float"
+		return "bc6h-rgb-float"
 	case TextureFormatBC7RGBAUnorm:
-		return "bc7rgba-unorm"
+		return "bc7-rgba-unorm"
 	case TextureFormatBC7RGBAUnormSrgb:
-		return "bc7rgba-unorm-srgb"
+		return "bc7-rgba-unorm-srgb"
 	case TextureFormatETC2RGB8Unorm:
-		return "etc2rgb8unorm"
+		return "etc2-rgb8unorm"
 	case TextureFormatETC2RGB8UnormSrgb:
-		return "etc2rgb8unorm-srgb"
+		return "etc2-rgb8unorm-srgb"
 	case TextureFormatETC2RGB8A1Unorm:
-		return "etc2rgb8a1unorm"
+		return "etc2-rgb8a1unorm"
 	case TextureFormatETC2RGB8A1UnormSrgb:
-		return "etc2rgb8a1unorm-srgb"
+		return "etc2-rgb8a1unorm-srgb"
 	case TextureFormatETC2RGBA8Unorm:
-		return "etc2rgba8unorm"
+		return "etc2-rgba8unorm"
 	case TextureFormatETC2RGBA8UnormSrgb:
-		return "etc2rgba8unorm-srgb"
+		return "etc2-rgba8unorm-srgb"
 	case TextureFormatEACR11Unorm:
-		return "eacr11unorm"
+		return "eac-r11unorm"
 	case TextureFormatEACR11Snorm:
-		return "eacr11snorm"
+		return "eac-r11snorm"
 	case TextureFormatEACRG11Unorm:
-		return "eacrg11unorm"
+		return "eac-rg11unorm"
 	case TextureFormatEACRG11Snorm:
-		return "eacrg11snorm"
+		return "eac-rg11snorm"
 	case TextureFormatASTC4x4Unorm:
-		return "astc4x4unorm"
+		return "astc-4x4-unorm"
 	case TextureFormatASTC4x4UnormSrgb:
-		return "astc4x4unorm-srgb"
+		return "astc-4x4-unorm-srgb"
 	case TextureFormatASTC5x4Unorm:
-		return "astc5x4unorm"
+		return "astc-5x4-unorm"
 	case TextureFormatASTC5x4UnormSrgb:
-		return "astc5x4unorm-srgb"
+		return "astc-5x4-unorm-srgb"
 	case TextureFormatASTC5x5Unorm:
-		return "astc5x5unorm"
+		return "astc-5x5-unorm"
 	case TextureFormatASTC5x5UnormSrgb:
-		return "astc5x5unorm-srgb"
+		return "astc-5x5-unorm-srgb"
 	case TextureFormatASTC6x5Unorm:
-		return "astc6x5unorm"
+		return "astc-6x5-unorm"
 	case TextureFormatASTC6x5UnormSrgb:
-		return "astc6x5unorm-srgb"
+		return "astc-6x5-unorm-srgb"
 	case TextureFormatASTC6x6Unorm:
-		return "astc6x6unorm"
+		return "astc-6x6-unorm"
 	case TextureFormatASTC6x6UnormSrgb:
-		return "astc6x6unorm-srgb"
+		return "astc-6x6-unorm-srgb"
 	case TextureFormatASTC8x5Unorm:
-		return "astc8x5unorm"
+		return "astc-8x5-unorm"
 	case TextureFormatASTC8x5UnormSrgb:
-		return "astc8x5unorm-srgb"
+		return "astc-8x5-unorm-srgb"
 	case TextureFormatASTC8x6Unorm:
-		return "astc8x6unorm"
+		return "astc-8x6-unorm"
 	case TextureFormatASTC8x6UnormSrgb:
-		return "astc8x6unorm-srgb"
+		return "astc-8x6-unorm-srgb"
 	case TextureFormatASTC8x8Unorm:
-		return "astc8x8unorm"
+		return "astc-8x8-unorm"
 	case TextureFormatASTC8x8UnormSrgb:
-		return "astc8x8unorm-srgb"
+		return "astc-8x8-unorm-srgb"
 	case TextureFormatASTC10x5Unorm:
-		return "astc10x5unorm"
+		return "astc-10x5-unorm"
 	case TextureFormatASTC10x5UnormSrgb:
-		return "astc10x5unorm-srgb"
+		return "astc-10x5-unorm-srgb"
 	case TextureFormatASTC10x6Unorm:
-		return "astc10x6unorm"
+		return "astc-10x6-unorm"
 	case TextureFormatASTC10x6UnormSrgb:
-		return "astc10x6unorm-srgb"
+		return "astc-10x6-unorm-srgb"
 	case TextureFormatASTC10x8Unorm:
-		return "astc10x8unorm"
+		return "astc-10x8-unorm"
 	case TextureFormatASTC10x8UnormSrgb:
-		return "astc10x8unorm-srgb"
+		return "astc-10x8-unorm-srgb"
 	case TextureFormatASTC10x10Unorm:
-		return "astc10x10unorm"
+		return "astc-10x10-unorm"
 	case TextureFormatASTC10x10UnormSrgb:
-		return "astc10x10unorm-srgb"
+		return "astc-10x10-unorm-srgb"
 	case TextureFormatASTC12x10Unorm:
-		return "astc12x10unorm"
+		return "astc-12x10-unorm"
 	case TextureFormatASTC12x10UnormSrgb:
-		return "astc12x10unorm-srgb"
+		return "astc-12x10-unorm-srgb"
 	case TextureFormatASTC12x12Unorm:
-		return "astc12x12unorm"
+		return "astc-12x12-unorm"
 	case TextureFormatASTC12x12UnormSrgb:
-		return "astc12x12unorm-srgb"
+		return "astc-12x12-unorm-srgb"
 	default:
 		return ""
 	}
@@ -2313,7 +2313,7 @@ func (v VertexFormat) String() string {
 	case VertexFormatUnorm10_10_10_2:
 		return "unorm10-10-10-2"
 	case VertexFormatUnorm8x4BGRA:
-		return "unorm8x4bgra"
+		return "unorm8x4-bgra"
 	default:
 		return ""
 	}
