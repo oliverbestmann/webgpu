@@ -15,6 +15,10 @@ static inline void gowebgpu_adapter_info_free_members(WGPUAdapterInfo * info) {
   wgpuAdapterInfoFreeMembers(*info);
 }
 
+static inline void gowebgpu_supported_features_free_members(WGPUSupportedFeatures * features) {
+  wgpuSupportedFeaturesFreeMembers(*features);
+}
+
 */
 import "C"
 import (
@@ -23,15 +27,22 @@ import (
 )
 
 func (g *Adapter) GetFeatures() []FeatureName {
-	var supportedFeatures C.WGPUSupportedFeatures
-	C.wgpuAdapterGetFeatures(g.ref, (*C.WGPUSupportedFeatures)(unsafe.Pointer(&supportedFeatures)))
-	defer free(supportedFeatures.features)
+	supported := callocOne[C.WGPUSupportedFeatures]()
+	defer free(supported)
 
-	features := make([]FeatureName, supportedFeatures.featureCount)
+	C.wgpuAdapterGetFeatures(g.ref, supported)
+	return takeFeatures(supported)
+}
 
-	for i := range int(supportedFeatures.featureCount) {
-		offset := uintptr(i) * sizeOf[C.WGPUFeatureName]()
-		features[i] = FeatureName(*(*C.WGPUFeatureName)(unsafe.Pointer(uintptr(unsafe.Pointer(supportedFeatures.features)) + offset)))
+// takeFeatures copies the features and frees the array that wgpu-native allocated,
+// which libc free must not touch. The struct lives in C memory, because an empty
+// list comes back as a dangling pointer that the Go runtime rejects on a stack.
+func takeFeatures(supported *C.WGPUSupportedFeatures) []FeatureName {
+	defer C.gowebgpu_supported_features_free_members(supported)
+
+	features := make([]FeatureName, supported.featureCount)
+	if len(features) > 0 {
+		copy(features, unsafe.Slice((*FeatureName)(unsafe.Pointer(supported.features)), len(features)))
 	}
 
 	return features

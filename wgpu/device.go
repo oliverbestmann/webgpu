@@ -909,18 +909,11 @@ func (g *Device) TryCreateTexture(descriptor *TextureDescriptor) (*Texture, erro
 }
 
 func (g *Device) GetFeatures() []FeatureName {
-	var supportedFeatures C.WGPUSupportedFeatures
-	C.wgpuDeviceGetFeatures(g.ref, (*C.WGPUSupportedFeatures)(unsafe.Pointer(&supportedFeatures)))
-	defer free(supportedFeatures.features)
+	supported := callocOne[C.WGPUSupportedFeatures]()
+	defer free(supported)
 
-	features := make([]FeatureName, supportedFeatures.featureCount)
-
-	for i := range int(supportedFeatures.featureCount) {
-		offset := uintptr(i) * sizeOf[C.WGPUFeatureName]()
-		features[i] = FeatureName(*(*C.WGPUFeatureName)(unsafe.Pointer(uintptr(unsafe.Pointer(supportedFeatures.features)) + offset)))
-	}
-
-	return features
+	C.wgpuDeviceGetFeatures(g.ref, supported)
+	return takeFeatures(supported)
 }
 
 func (g *Device) GetLimits() Limits {
