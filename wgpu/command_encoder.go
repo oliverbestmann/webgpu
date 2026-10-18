@@ -115,6 +115,7 @@ func (p *CommandEncoder) TryBeginRenderPass(descriptor *RenderPassDescriptor) (*
 
 	ref := C.go_wgpuCommandEncoderBeginRenderPass(p.device, errh.ToPointer(), p.ref, &desc)
 	if err := errh.ToError(); err != nil {
+		C.wgpuRenderPassEncoderRelease(ref)
 		return nil, err
 	}
 
