@@ -28,8 +28,11 @@ func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
 	promise := g.jsValue.Call("requestDevice", desc)
 
 	device, ok := jsx.Await(promise)
-	if !ok || !device.Truthy() {
-		return nil, fmt.Errorf("no WebGPU device avaliable")
+	if !ok {
+		return nil, fmt.Errorf("failed to request device: %s", rejectionReason(device))
+	}
+	if !device.Truthy() {
+		return nil, fmt.Errorf("failed to request device: no WebGPU device available")
 	}
 	return &Device{jsValue: device}, nil
 }

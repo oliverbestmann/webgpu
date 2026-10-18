@@ -21,8 +21,11 @@ func CreateInstance(descriptor *InstanceDescriptor) *Instance {
 
 func (g *Instance) RequestAdapter(options *RequestAdapterOptions) (*Adapter, error) {
 	adapter, ok := jsx.Await(g.jsValue.Call("requestAdapter", pointerToJS(options)))
-	if !ok || !adapter.Truthy() {
-		return nil, fmt.Errorf("no WebGPU adapter avaliable")
+	if !ok {
+		return nil, fmt.Errorf("failed to request adapter: %s", rejectionReason(adapter))
+	}
+	if !adapter.Truthy() {
+		return nil, fmt.Errorf("failed to request adapter: no WebGPU adapter available")
 	}
 	return &Adapter{jsValue: adapter}, nil
 }
@@ -53,3 +56,12 @@ func (g *Instance) CreateSurface(descriptor *SurfaceDescriptor) *Surface {
 }
 
 func (g *Instance) GenerateReport() any { return nil } // no-op
+
+// rejectionReason describes the value a promise was rejected with, usually a DOMException.
+func rejectionReason(reason js.Value) string {
+	if reason.IsUndefined() || reason.IsNull() {
+		return "unknown error"
+	}
+
+	return reason.Call("toString").String()
+}
