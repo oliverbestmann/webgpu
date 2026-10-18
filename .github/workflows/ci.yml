@@ -85,6 +85,7 @@ jobs:
     env:
       GOOS: js
       GOARCH: wasm
+      CGO_ENABLED: "0"
 
     steps:
       - name: Checkout
@@ -95,6 +96,31 @@ jobs:
         with:
           go-version: "stable"
 
-      - name: Build a wasm file
+      - name: Vet
         run: |
-          go build ./examples/triangle
+          go vet ./wgpu/
+          go vet -tags goscript ./wgpu/
+
+      - name: Build examples
+        run: |
+          for example in adapters capture compute triangle ; do
+            go build -o /dev/null ./examples/$example
+          done
+
+  generated-code:
+    name: "Generated code is up to date"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+
+      - name: Regenerate and compare
+        run: |
+          go generate ./wgpu
+          git diff --exit-code
