@@ -57,6 +57,24 @@ func (g *ComputePassEncoder) DispatchWorkgroups(workgroupCountX, workgroupCountY
 	g.jsValue.Call("dispatchWorkgroups", params...)
 }
 
+// InsertDebugMarker as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpudebugcommandsmixin-insertdebugmarker
+func (g *ComputePassEncoder) InsertDebugMarker(markerLabel string) {
+	g.jsValue.Call("insertDebugMarker", markerLabel)
+}
+
+// PopDebugGroup as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpudebugcommandsmixin-popdebuggroup
+func (g *ComputePassEncoder) PopDebugGroup() {
+	g.jsValue.Call("popDebugGroup")
+}
+
+// PushDebugGroup as described:
+// https://gpuweb.github.io/gpuweb/#dom-gpudebugcommandsmixin-pushdebuggroup
+func (g *ComputePassEncoder) PushDebugGroup(groupLabel string) {
+	g.jsValue.Call("pushDebugGroup", groupLabel)
+}
+
 // TryEnd as described:
 // https://gpuweb.github.io/gpuweb/#dom-gpucomputepassencoder-end
 func (g *ComputePassEncoder) TryEnd() (err error) {
