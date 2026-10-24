@@ -17,9 +17,8 @@ func (g *RenderBundleEncoder) SetPipeline(pipeline *RenderPipeline) {
 // SetBindGroup as described:
 // https://gpuweb.github.io/gpuweb/#gpubindingcommandsmixin-setbindgroup
 func (g *RenderBundleEncoder) SetBindGroup(groupIndex uint32, group *BindGroup, dynamicOffsets []uint32) {
-	g.jsValue.Call("setBindGroup", groupIndex, pointerToJS(group), mapSlice(dynamicOffsets, func(offset uint32) any {
-		return offset
-	}))
+	offsets, start, length := dynamicOffsetsToJS(dynamicOffsets)
+	g.jsValue.Call("setBindGroup", groupIndex, pointerToJS(group), offsets, start, length)
 }
 
 // SetVertexBuffer as described:

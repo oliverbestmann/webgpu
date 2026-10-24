@@ -108,9 +108,7 @@ func (g BindGroupLayoutEntry) toJS() js.Value {
 
 func (g BindGroupLayoutDescriptor) toJS() js.Value {
 	return js.ValueOf(map[string]any{
-		"entries": mapSlice(g.Entries, func(entry BindGroupLayoutEntry) any {
-			return entry.toJS()
-		}),
+		"entries": sliceToJS(g.Entries, BindGroupLayoutEntry.toJS),
 	})
 }
 

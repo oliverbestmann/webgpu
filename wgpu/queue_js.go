@@ -7,10 +7,7 @@ import "github.com/oliverbestmann/webgpu/jsx"
 // Submit as described:
 // https://gpuweb.github.io/gpuweb/#dom-gpuqueue-submit
 func (g *Queue) Submit(commandBuffers ...*CommandBuffer) SubmissionIndex {
-	jsSequence := mapSlice(commandBuffers, func(buffer *CommandBuffer) any {
-		return pointerToJS(buffer)
-	})
-	g.jsValue.Call("submit", jsSequence)
+	g.jsValue.Call("submit", sliceToJS(commandBuffers, pointerToJS[CommandBuffer]))
 	return SubmissionIndex(0)
 }
 

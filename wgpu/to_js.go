@@ -35,7 +35,7 @@ func (c *reusedObjects) get(idx int) js.Value {
 //
 // The JS strings are cached: passing a Go string to JS creates a new JS string,
 // a heap allocation and a finalizer every time.
-func enumToJS(s fmt.Stringer) js.Value {
+func enumToJS[E fmt.Stringer](s E) js.Value {
 	ss := s.String()
 	if ss == "undefined" {
 		return js.Undefined()
@@ -81,14 +81,14 @@ func labelToJS(label string) js.Value {
 // pointerToJS converts the given pointer value to a type that can be
 // passed as an argument to JavaScript. It must implement a toJS method.
 // Returning js.Value instead of any avoids a heap allocation per call for handles.
-func pointerToJS[T, R any, P interface {
+func pointerToJS[T any, P interface {
 	*T
-	toJS() R
+	toJS() js.Value
 }](v P) js.Value {
 	if v == nil {
 		return js.Undefined()
 	}
-	return js.ValueOf(v.toJS())
+	return v.toJS()
 }
 
 // uint32ToJS converts the given uint32 value to a type that can be
@@ -131,7 +131,7 @@ func (g *RequestAdapterOptions) toJS() js.Value {
 func (g *DeviceDescriptor) toJS() js.Value {
 	result := make(map[string]any)
 	result["label"] = labelToJS(g.Label)
-	result["requiredFeatures"] = mapSlice(g.RequiredFeatures, func(f FeatureName) any { return f.String() })
+	result["requiredFeatures"] = sliceToJS(g.RequiredFeatures, enumToJS[FeatureName])
 	if g.RequiredLimits != nil {
 		result["requiredLimits"] = g.RequiredLimits.toJS()
 	}
@@ -143,9 +143,7 @@ func (g *SurfaceConfiguration) toJS() js.Value {
 	result["usage"] = uint32(g.Usage)
 	result["format"] = enumToJS(g.Format)
 	result["alphaMode"] = enumToJS(g.AlphaMode)
-	result["viewFormats"] = mapSlice(g.ViewFormats, func(f TextureFormat) any {
-		return enumToJS(f)
-	})
+	result["viewFormats"] = sliceToJS(g.ViewFormats, enumToJS[TextureFormat])
 	return js.ValueOf(result)
 }
 
@@ -158,9 +156,7 @@ func (g *TextureDescriptor) toJS() js.Value {
 		"format":        enumToJS(g.Format),
 		"mipLevelCount": g.MipLevelCount,
 		"sampleCount":   g.SampleCount,
-		"viewFormats": mapSlice(g.ViewFormats, func(f TextureFormat) any {
-			return enumToJS(f)
-		}),
+		"viewFormats":   sliceToJS(g.ViewFormats, enumToJS[TextureFormat]),
 	})
 }
 
@@ -189,7 +185,7 @@ func (g *CommandEncoderDescriptor) toJS() js.Value {
 func (g *RenderBundleEncoderDescriptor) toJS() js.Value {
 	return js.ValueOf(map[string]any{
 		"label":              labelToJS(g.Label),
-		"colorFormats":       mapSlice(g.ColorFormats, func(s TextureFormat) any { return enumToJS(s) }),
+		"colorFormats":       sliceToJS(g.ColorFormats, enumToJS[TextureFormat]),
 		"depthStencilFormat": enumToJS(g.DepthStencilFormat),
 		"sampleCount":        g.SampleCount,
 		"depthReadOnly":      g.DepthReadOnly,

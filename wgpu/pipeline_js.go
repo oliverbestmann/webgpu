@@ -13,9 +13,7 @@ type PipelineLayoutDescriptor struct {
 
 func (g *PipelineLayoutDescriptor) toJS() js.Value {
 	return js.ValueOf(map[string]any{
-		"bindGroupLayouts": mapSlice(g.BindGroupLayouts, func(layout *BindGroupLayout) any {
-			return pointerToJS(layout)
-		}),
+		"bindGroupLayouts": sliceToJS(g.BindGroupLayouts, pointerToJS[BindGroupLayout]),
 	})
 }
 
@@ -47,9 +45,7 @@ func (g VertexBufferLayout) toJS() js.Value {
 	result := make(map[string]any)
 	result["arrayStride"] = g.ArrayStride
 	result["stepMode"] = enumToJS(g.StepMode)
-	result["attributes"] = mapSlice(g.Attributes, func(attrib VertexAttribute) any {
-		return attrib.toJS()
-	})
+	result["attributes"] = sliceToJS(g.Attributes, VertexAttribute.toJS)
 	return js.ValueOf(result)
 }
 
@@ -65,9 +61,7 @@ func (g VertexState) toJS() js.Value {
 	return js.ValueOf(map[string]any{
 		"module":     pointerToJS(g.Module),
 		"entryPoint": g.EntryPoint,
-		"buffers": mapSlice(g.Buffers, func(layout VertexBufferLayout) any {
-			return layout.toJS()
-		}),
+		"buffers":    sliceToJS(g.Buffers, VertexBufferLayout.toJS),
 	})
 }
 
@@ -215,9 +209,7 @@ func (g FragmentState) toJS() js.Value {
 	return js.ValueOf(map[string]any{
 		"module":     pointerToJS(g.Module),
 		"entryPoint": g.EntryPoint,
-		"targets": mapSlice(g.Targets, func(target ColorTargetState) any {
-			return target.toJS()
-		}),
+		"targets":    sliceToJS(g.Targets, ColorTargetState.toJS),
 	})
 }
 

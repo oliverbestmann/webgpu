@@ -29,13 +29,8 @@ func (g *ComputePassEncoder) SetPipeline(pipeline *ComputePipeline) {
 // SetBindGroup as described:
 // https://gpuweb.github.io/gpuweb/#dom-gpubindingcommandsmixin-setbindgroup
 func (g *ComputePassEncoder) SetBindGroup(index uint32, bindGroup *BindGroup, dynamicOffsets []uint32) {
-	params := make([]any, 3)
-	params[0] = index
-	params[1] = pointerToJS(bindGroup)
-	params[2] = mapSlice(dynamicOffsets, func(offset uint32) any {
-		return offset
-	})
-	g.jsValue.Call("setBindGroup", params...)
+	offsets, start, length := dynamicOffsetsToJS(dynamicOffsets)
+	g.jsValue.Call("setBindGroup", index, pointerToJS(bindGroup), offsets, start, length)
 }
 
 // DispatchWorkgroups as described:

@@ -8,6 +8,15 @@ import "syscall/js"
 // One array is enough: wasm is single threaded and setBindGroup copies the offsets.
 var dynamicOffsetsArray = js.Global().Get("Uint32Array").New(128)
 
+// dynamicOffsetsToJS returns the setBindGroup arguments for the offsets:
+// the shared array, the start index and the length.
+func dynamicOffsetsToJS(offsets []uint32) (js.Value, int, int) {
+	for idx, value := range offsets {
+		dynamicOffsetsArray.SetIndex(idx, value)
+	}
+	return dynamicOffsetsArray, 0, len(offsets)
+}
+
 // Invoking a cached function avoids encoding and looking up the method name
 // on every call, which matters for methods called many times per frame.
 var (
@@ -68,11 +77,8 @@ func (g *RenderPassEncoder) SetIndexBuffer(indexBuffer *Buffer, format IndexForm
 // SetBindGroup as described:
 // https://gpuweb.github.io/gpuweb/#gpubindingcommandsmixin-setbindgroup
 func (g *RenderPassEncoder) SetBindGroup(index uint32, bindGroup *BindGroup, dynamicOffsets []uint32) {
-	for idx, value := range dynamicOffsets {
-		dynamicOffsetsArray.SetIndex(idx, value)
-	}
-
-	jsRenderPassEncoderSetBindGroup.Invoke(g.jsValue, index, pointerToJS(bindGroup), dynamicOffsetsArray, 0, len(dynamicOffsets))
+	offsets, start, length := dynamicOffsetsToJS(dynamicOffsets)
+	jsRenderPassEncoderSetBindGroup.Invoke(g.jsValue, index, pointerToJS(bindGroup), offsets, start, length)
 }
 
 // SetBlendConstant as described:
@@ -134,9 +140,7 @@ func (g *RenderPassEncoder) EndOcclusionQuery() {
 // ExecuteBundles as described:
 // https://gpuweb.github.io/gpuweb/#dom-gpurenderpassencoder-executebundles
 func (g *RenderPassEncoder) ExecuteBundles(bundles ...*RenderBundle) {
-	g.jsValue.Call("executeBundles", mapSlice(bundles, func(bundle *RenderBundle) any {
-		return pointerToJS(bundle)
-	}))
+	g.jsValue.Call("executeBundles", sliceToJS(bundles, pointerToJS[RenderBundle]))
 }
 
 // InsertDebugMarker as described:
