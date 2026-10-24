@@ -115,7 +115,7 @@ func main() {
 				return g != nil
 			}
 
-			func (g *%[1]s) toJS() any {
+			func (g *%[1]s) toJS() js.Value {
 				return g.jsValue
 			}
 

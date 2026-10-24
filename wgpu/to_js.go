@@ -7,27 +7,63 @@ import (
 	"syscall/js"
 )
 
+var (
+	jsObject = js.Global().Get("Object")
+	jsArray  = js.Global().Get("Array")
+)
+
+// reusedObjects hands out JS objects that are filled again on every call instead of
+// creating new ones, which avoids the object creation and the finalizer syscall/js
+// registers for each new object. This is safe because WebGPU copies a descriptor when
+// the method is called, and Go on wasm runs on a single thread.
+// Every fill must set all fields, using undefined for absent ones.
+type reusedObjects struct {
+	ctor    js.Value
+	objects []js.Value
+}
+
+func (c *reusedObjects) get(idx int) js.Value {
+	for len(c.objects) <= idx {
+		c.objects = append(c.objects, c.ctor.New())
+	}
+	return c.objects[idx]
+}
+
 // enumToJS converts the given non-bit-flag enum value to a type that
 // can be passed as an argument to JavaScript. Bit flag enums should be
 // passed as a uint.
-func enumToJS(s fmt.Stringer) any {
+//
+// The JS strings are cached: passing a Go string to JS creates a new JS string,
+// a heap allocation and a finalizer every time.
+func enumToJS(s fmt.Stringer) js.Value {
 	ss := s.String()
 	if ss == "undefined" {
 		return js.Undefined()
 	}
-	return ss
+
+	value, ok := enumStrings[ss]
+	if !ok {
+		value = js.ValueOf(ss)
+		enumStrings[ss] = value
+	}
+
+	return value
 }
+
+// enumStrings needs no lock, Go on wasm runs on a single thread.
+var enumStrings = map[string]js.Value{}
 
 // pointerToJS converts the given pointer value to a type that can be
 // passed as an argument to JavaScript. It must implement a toJS method.
-func pointerToJS[T any, P interface {
+// Returning js.Value instead of any avoids a heap allocation per call for handles.
+func pointerToJS[T, R any, P interface {
 	*T
-	toJS() any
-}](v P) any {
+	toJS() R
+}](v P) js.Value {
 	if v == nil {
 		return js.Undefined()
 	}
-	return v.toJS()
+	return js.ValueOf(v.toJS())
 }
 
 // uint32ToJS converts the given uint32 value to a type that can be
@@ -192,45 +228,70 @@ func (g *PassTimestampWrites) toJS() any {
 	return result
 }
 
-func (g *RenderPassDescriptor) toJS() any {
-	result := make(map[string]any)
-	result["colorAttachments"] = mapSlice(g.ColorAttachments, func(attachment RenderPassColorAttachment) any {
-		return attachment.toJS()
-	})
-	result["depthStencilAttachment"] = pointerToJS(g.DepthStencilAttachment)
-	if writes := g.TimestampWrites.toJS(); writes != nil {
-		result["timestampWrites"] = writes
+var (
+	renderPassDescriptor       = jsObject.New()
+	renderPassColorArray       = jsArray.New()
+	renderPassColorAttachments = reusedObjects{ctor: jsObject}
+	renderPassClearValues      = reusedObjects{ctor: jsArray}
+	renderPassDepthStencil     = jsObject.New()
+)
+
+func (g *RenderPassDescriptor) toJS() js.Value {
+	renderPassColorArray.Set("length", len(g.ColorAttachments))
+	for idx := range g.ColorAttachments {
+		renderPassColorArray.SetIndex(idx, g.ColorAttachments[idx].toJS(idx))
 	}
+
+	var writes any = js.Undefined()
+	if w := g.TimestampWrites.toJS(); w != nil {
+		writes = w
+	}
+
+	result := renderPassDescriptor
+	result.Set("colorAttachments", renderPassColorArray)
+	result.Set("depthStencilAttachment", pointerToJS(g.DepthStencilAttachment))
+	result.Set("timestampWrites", writes)
 	return result
 }
 
-func (g *RenderPassColorAttachment) toJS() any {
-	result := make(map[string]any)
-	result["view"] = g.View.jsValue
-	result["loadOp"] = enumToJS(g.LoadOp)
-	result["storeOp"] = enumToJS(g.StoreOp)
-	result["clearValue"] = g.ClearValue.toJS()
-	result["resolveTarget"] = pointerToJS(g.ResolveTarget)
+// toJS fills the reused attachment object at idx.
+func (g *RenderPassColorAttachment) toJS(idx int) js.Value {
+	clearValue := renderPassClearValues.get(idx)
+	clearValue.SetIndex(0, g.ClearValue.R)
+	clearValue.SetIndex(1, g.ClearValue.G)
+	clearValue.SetIndex(2, g.ClearValue.B)
+	clearValue.SetIndex(3, g.ClearValue.A)
+
+	result := renderPassColorAttachments.get(idx)
+	result.Set("view", g.View.jsValue)
+	result.Set("loadOp", enumToJS(g.LoadOp))
+	result.Set("storeOp", enumToJS(g.StoreOp))
+	result.Set("clearValue", clearValue)
+	result.Set("resolveTarget", pointerToJS(g.ResolveTarget))
 	return result
 }
 
-func (g *RenderPassDepthStencilAttachment) toJS() any {
-	result := map[string]any{
-		"view":              pointerToJS(g.View),
-		"depthClearValue":   g.DepthClearValue,
-		"stencilClearValue": g.StencilClearValue,
-		"depthReadOnly":     g.DepthReadOnly,
-		"stencilReadOnly":   g.StencilReadOnly,
-	}
+func (g *RenderPassDepthStencilAttachment) toJS() js.Value {
+	result := renderPassDepthStencil
+	result.Set("view", pointerToJS(g.View))
+	result.Set("depthClearValue", g.DepthClearValue)
+	result.Set("stencilClearValue", g.StencilClearValue)
+	result.Set("depthReadOnly", g.DepthReadOnly)
+	result.Set("stencilReadOnly", g.StencilReadOnly)
+
 	// https://www.w3.org/TR/webgpu/#abstract-opdef-gpurenderpassdepthstencilattachment-gpurenderpassdepthstencilattachment-valid-usage
+	var depthLoadOp, depthStoreOp, stencilLoadOp, stencilStoreOp any = js.Undefined(), js.Undefined(), js.Undefined(), js.Undefined()
 	if !g.DepthReadOnly {
-		result["depthLoadOp"] = enumToJS(g.DepthLoadOp)
-		result["depthStoreOp"] = enumToJS(g.DepthStoreOp)
+		depthLoadOp, depthStoreOp = enumToJS(g.DepthLoadOp), enumToJS(g.DepthStoreOp)
 	}
 	if !g.StencilReadOnly {
-		result["stencilLoadOp"] = enumToJS(g.StencilLoadOp)
-		result["stencilStoreOp"] = enumToJS(g.StencilStoreOp)
+		stencilLoadOp, stencilStoreOp = enumToJS(g.StencilLoadOp), enumToJS(g.StencilStoreOp)
 	}
+
+	result.Set("depthLoadOp", depthLoadOp)
+	result.Set("depthStoreOp", depthStoreOp)
+	result.Set("stencilLoadOp", stencilLoadOp)
+	result.Set("stencilStoreOp", stencilStoreOp)
 	return result
 }
 

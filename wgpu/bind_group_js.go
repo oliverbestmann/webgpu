@@ -114,29 +114,41 @@ func (g BindGroupLayoutDescriptor) toJS() any {
 	}
 }
 
-func (g BindGroupEntry) toJS() any {
-	result := make(map[string]any)
-	result["binding"] = g.Binding
+var (
+	bindGroupDescriptor     = jsObject.New()
+	bindGroupEntryArray     = jsArray.New()
+	bindGroupEntries        = reusedObjects{ctor: jsObject}
+	bindGroupBufferBindings = reusedObjects{ctor: jsObject}
+)
+
+// toJS fills the reused entry object at idx.
+func (g *BindGroupEntry) toJS(idx int) js.Value {
+	var resource js.Value
 	switch {
 	case g.Sampler != nil:
-		result["resource"] = pointerToJS(g.Sampler)
+		resource = g.Sampler.jsValue
 	case g.TextureView != nil:
-		result["resource"] = pointerToJS(g.TextureView)
+		resource = g.TextureView.jsValue
 	default:
-		result["resource"] = map[string]any{
-			"buffer": pointerToJS(g.Buffer),
-			"offset": g.Offset,
-			"size":   uint64ToJS(g.Size),
-		}
+		resource = bindGroupBufferBindings.get(idx)
+		resource.Set("buffer", pointerToJS(g.Buffer))
+		resource.Set("offset", g.Offset)
+		resource.Set("size", uint64ToJS(g.Size))
 	}
+
+	result := bindGroupEntries.get(idx)
+	result.Set("binding", g.Binding)
+	result.Set("resource", resource)
 	return result
 }
 
-func (g BindGroupDescriptor) toJS() any {
-	return map[string]any{
-		"layout": pointerToJS(g.Layout),
-		"entries": mapSlice(g.Entries, func(entry BindGroupEntry) any {
-			return entry.toJS()
-		}),
+func (g BindGroupDescriptor) toJS() js.Value {
+	bindGroupEntryArray.Set("length", len(g.Entries))
+	for idx := range g.Entries {
+		bindGroupEntryArray.SetIndex(idx, g.Entries[idx].toJS(idx))
 	}
+
+	bindGroupDescriptor.Set("layout", pointerToJS(g.Layout))
+	bindGroupDescriptor.Set("entries", bindGroupEntryArray)
+	return bindGroupDescriptor
 }

@@ -17,7 +17,7 @@ func (g *Buffer) IsValid() bool {
 	return g != nil
 }
 
-func (g *Buffer) toJS() any {
+func (g *Buffer) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -36,7 +36,7 @@ func (g *CommandEncoder) IsValid() bool {
 	return g != nil
 }
 
-func (g *CommandEncoder) toJS() any {
+func (g *CommandEncoder) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -55,7 +55,7 @@ func (g *ComputePassEncoder) IsValid() bool {
 	return g != nil
 }
 
-func (g *ComputePassEncoder) toJS() any {
+func (g *ComputePassEncoder) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -74,7 +74,7 @@ func (g *Queue) IsValid() bool {
 	return g != nil
 }
 
-func (g *Queue) toJS() any {
+func (g *Queue) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -93,7 +93,7 @@ func (g *RenderPassEncoder) IsValid() bool {
 	return g != nil
 }
 
-func (g *RenderPassEncoder) toJS() any {
+func (g *RenderPassEncoder) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -112,7 +112,7 @@ func (g *Surface) IsValid() bool {
 	return g != nil
 }
 
-func (g *Surface) toJS() any {
+func (g *Surface) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -131,7 +131,7 @@ func (g *Texture) IsValid() bool {
 	return g != nil
 }
 
-func (g *Texture) toJS() any {
+func (g *Texture) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -150,7 +150,7 @@ func (g *Adapter) IsValid() bool {
 	return g != nil
 }
 
-func (g *Adapter) toJS() any {
+func (g *Adapter) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -169,7 +169,7 @@ func (g *BindGroup) IsValid() bool {
 	return g != nil
 }
 
-func (g *BindGroup) toJS() any {
+func (g *BindGroup) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -188,7 +188,7 @@ func (g *BindGroupLayout) IsValid() bool {
 	return g != nil
 }
 
-func (g *BindGroupLayout) toJS() any {
+func (g *BindGroupLayout) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -207,7 +207,7 @@ func (g *CommandBuffer) IsValid() bool {
 	return g != nil
 }
 
-func (g *CommandBuffer) toJS() any {
+func (g *CommandBuffer) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -226,7 +226,7 @@ func (g *ComputePipeline) IsValid() bool {
 	return g != nil
 }
 
-func (g *ComputePipeline) toJS() any {
+func (g *ComputePipeline) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -245,7 +245,7 @@ func (g *Device) IsValid() bool {
 	return g != nil
 }
 
-func (g *Device) toJS() any {
+func (g *Device) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -264,7 +264,7 @@ func (g *Instance) IsValid() bool {
 	return g != nil
 }
 
-func (g *Instance) toJS() any {
+func (g *Instance) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -283,7 +283,7 @@ func (g *PipelineLayout) IsValid() bool {
 	return g != nil
 }
 
-func (g *PipelineLayout) toJS() any {
+func (g *PipelineLayout) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -302,7 +302,7 @@ func (g *QuerySet) IsValid() bool {
 	return g != nil
 }
 
-func (g *QuerySet) toJS() any {
+func (g *QuerySet) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -321,7 +321,7 @@ func (g *RenderBundle) IsValid() bool {
 	return g != nil
 }
 
-func (g *RenderBundle) toJS() any {
+func (g *RenderBundle) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -340,7 +340,7 @@ func (g *RenderBundleEncoder) IsValid() bool {
 	return g != nil
 }
 
-func (g *RenderBundleEncoder) toJS() any {
+func (g *RenderBundleEncoder) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -359,7 +359,7 @@ func (g *RenderPipeline) IsValid() bool {
 	return g != nil
 }
 
-func (g *RenderPipeline) toJS() any {
+func (g *RenderPipeline) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -378,7 +378,7 @@ func (g *Sampler) IsValid() bool {
 	return g != nil
 }
 
-func (g *Sampler) toJS() any {
+func (g *Sampler) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -397,7 +397,7 @@ func (g *ShaderModule) IsValid() bool {
 	return g != nil
 }
 
-func (g *ShaderModule) toJS() any {
+func (g *ShaderModule) toJS() js.Value {
 	return g.jsValue
 }
 
@@ -416,7 +416,7 @@ func (g *TextureView) IsValid() bool {
 	return g != nil
 }
 
-func (g *TextureView) toJS() any {
+func (g *TextureView) toJS() js.Value {
 	return g.jsValue
 }
 
