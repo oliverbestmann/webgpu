@@ -10,20 +10,21 @@ import (
 )
 
 func (g *Adapter) RequestDevice(descriptor *DeviceDescriptor) (*Device, error) {
-	var desc any = js.Undefined()
+	desc := js.Undefined()
 	if descriptor != nil {
-		dm := descriptor.toJS().(map[string]any)
-		// requestDevice rejects limits the browser does not know about,
-		// so only pass those that are present in the adapter limits.
-		if rl, ok := dm["requiredLimits"].(map[string]any); ok {
+		desc = descriptor.toJS()
+		if descriptor.RequiredLimits != nil {
+			// requestDevice rejects limits the browser does not know about,
+			// so only pass those that are present in the adapter limits.
+			limits := descriptor.RequiredLimits.toJS()
 			al := g.jsValue.Get("limits")
-			for k := range rl {
+			for k := range limits {
 				if al.Get(k).IsUndefined() {
-					delete(rl, k)
+					delete(limits, k)
 				}
 			}
+			desc.Set("requiredLimits", limits)
 		}
-		desc = dm
 	}
 	promise := g.jsValue.Call("requestDevice", desc)
 

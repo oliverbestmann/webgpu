@@ -3,6 +3,7 @@
 package wgpu
 
 import (
+	"strconv"
 	"syscall/js"
 	"testing"
 )
@@ -76,5 +77,18 @@ func TestBindGroupDescriptorReuse(t *testing.T) {
 	want = `{"layout":"layout","entries":[{"binding":2,"resource":"sampler"}]}`
 	if got != want {
 		t.Fatalf("got  %s\nwant %s", got, want)
+	}
+}
+
+func TestLabelCacheIsBounded(t *testing.T) {
+	for idx := range 2 * maxLabelStrings {
+		label := strconv.Itoa(idx)
+		if got := labelToJS(label).String(); got != label {
+			t.Fatalf("got %q, want %q", got, label)
+		}
+	}
+
+	if len(labelStrings) != maxLabelStrings {
+		t.Fatalf("cache has %d entries, want %d", len(labelStrings), maxLabelStrings)
 	}
 }

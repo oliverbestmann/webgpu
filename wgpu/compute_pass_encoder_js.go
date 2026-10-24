@@ -13,12 +13,11 @@ type ComputePassDescriptor struct {
 	TimestampWrites *PassTimestampWrites
 }
 
-func (g *ComputePassDescriptor) toJS() any {
-	result := map[string]any{"label": g.Label}
-	if writes := g.TimestampWrites.toJS(); writes != nil {
-		result["timestampWrites"] = writes
-	}
-	return result
+func (g *ComputePassDescriptor) toJS() js.Value {
+	return js.ValueOf(map[string]any{
+		"label":           labelToJS(g.Label),
+		"timestampWrites": g.TimestampWrites.toJS(),
+	})
 }
 
 // SetPipeline as described:
@@ -66,7 +65,7 @@ func (g *ComputePassEncoder) DispatchWorkgroupsIndirect(indirectBuffer *Buffer, 
 // InsertDebugMarker as described:
 // https://gpuweb.github.io/gpuweb/#dom-gpudebugcommandsmixin-insertdebugmarker
 func (g *ComputePassEncoder) InsertDebugMarker(markerLabel string) {
-	g.jsValue.Call("insertDebugMarker", markerLabel)
+	g.jsValue.Call("insertDebugMarker", labelToJS(markerLabel))
 }
 
 // PopDebugGroup as described:
@@ -78,7 +77,7 @@ func (g *ComputePassEncoder) PopDebugGroup() {
 // PushDebugGroup as described:
 // https://gpuweb.github.io/gpuweb/#dom-gpudebugcommandsmixin-pushdebuggroup
 func (g *ComputePassEncoder) PushDebugGroup(groupLabel string) {
-	g.jsValue.Call("pushDebugGroup", groupLabel)
+	g.jsValue.Call("pushDebugGroup", labelToJS(groupLabel))
 }
 
 // TryEnd as described:

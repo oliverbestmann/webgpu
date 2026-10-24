@@ -2,6 +2,8 @@
 
 package wgpu
 
+import "syscall/js"
+
 // ComputePipeline Descriptor as described:
 // https://gpuweb.github.io/gpuweb/#dictdef-gpucomputepipelinedescriptor
 type ComputePipelineDescriptor struct {
@@ -10,15 +12,15 @@ type ComputePipelineDescriptor struct {
 	Compute ProgrammableStageDescriptor
 }
 
-func (g ComputePipelineDescriptor) toJS() any {
-	result := map[string]any{"label": g.Label}
+func (g ComputePipelineDescriptor) toJS() js.Value {
+	result := map[string]any{"label": labelToJS(g.Label)}
 	if g.Layout != nil {
 		result["layout"] = pointerToJS(g.Layout)
 	} else {
 		result["layout"] = "auto"
 	}
 	result["compute"] = g.Compute.toJS()
-	return result
+	return js.ValueOf(result)
 }
 
 func (g *ComputePipeline) GetBindGroupLayout(groupIndex uint32) *BindGroupLayout {

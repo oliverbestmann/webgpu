@@ -2,6 +2,8 @@
 
 package wgpu
 
+import "syscall/js"
+
 // ShaderModuleDescriptor as described:
 // https://gpuweb.github.io/gpuweb/#dictdef-gpushadermoduledescriptor
 type ShaderModuleDescriptor struct {
@@ -9,8 +11,8 @@ type ShaderModuleDescriptor struct {
 	WGSLSource *ShaderSourceWGSL
 }
 
-func (g ShaderModuleDescriptor) toJS() any {
-	return map[string]any{
+func (g ShaderModuleDescriptor) toJS() js.Value {
+	return js.ValueOf(map[string]any{
 		"code": g.WGSLSource.Code,
-	}
+	})
 }

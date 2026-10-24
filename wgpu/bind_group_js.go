@@ -14,12 +14,12 @@ type BufferBindingLayout struct {
 	MinBindingSize   uint64
 }
 
-func (g BufferBindingLayout) toJS() any {
+func (g BufferBindingLayout) toJS() js.Value {
 	result := make(map[string]any)
 	result["type"] = enumToJS(g.Type)
 	result["hasDynamicOffset"] = g.HasDynamicOffset
 	result["minBindingSize"] = g.MinBindingSize
-	return result
+	return js.ValueOf(result)
 }
 
 // SamplerBindingLayout as described:
@@ -28,10 +28,10 @@ type SamplerBindingLayout struct {
 	Type SamplerBindingType
 }
 
-func (g SamplerBindingLayout) toJS() any {
+func (g SamplerBindingLayout) toJS() js.Value {
 	result := make(map[string]any)
 	result["type"] = enumToJS(g.Type)
-	return result
+	return js.ValueOf(result)
 }
 
 // TextureBindingLayout as described:
@@ -42,12 +42,12 @@ type TextureBindingLayout struct {
 	Multisampled  bool
 }
 
-func (g TextureBindingLayout) toJS() any {
+func (g TextureBindingLayout) toJS() js.Value {
 	result := make(map[string]any)
 	result["sampleType"] = enumToJS(g.SampleType)
 	result["viewDimension"] = enumToJS(g.ViewDimension)
 	result["multisampled"] = g.Multisampled
-	return result
+	return js.ValueOf(result)
 }
 
 // StorageTextureBindingLayout as described:
@@ -58,12 +58,12 @@ type StorageTextureBindingLayout struct {
 	ViewDimension TextureViewDimension
 }
 
-func (g StorageTextureBindingLayout) toJS() any {
+func (g StorageTextureBindingLayout) toJS() js.Value {
 	result := make(map[string]any)
 	result["access"] = enumToJS(g.Access)
 	result["format"] = enumToJS(g.Format)
 	result["viewDimension"] = enumToJS(g.ViewDimension)
-	return result
+	return js.ValueOf(result)
 }
 
 // ExternalTextureBindingLayout as described:
@@ -71,8 +71,8 @@ type ExternalTextureBindingLayout struct {
 	jsValue any
 }
 
-func (g ExternalTextureBindingLayout) toJS() any {
-	return g.jsValue
+func (g ExternalTextureBindingLayout) toJS() js.Value {
+	return js.ValueOf(g.jsValue)
 }
 
 // BindGroupLayoutEntry as described:
@@ -87,7 +87,7 @@ type BindGroupLayoutEntry struct {
 	ExternalTexture ExternalTextureBindingLayout
 }
 
-func (g BindGroupLayoutEntry) toJS() any {
+func (g BindGroupLayoutEntry) toJS() js.Value {
 	result := make(map[string]any)
 	result["binding"] = g.Binding
 	result["visibility"] = uint32(g.Visibility)
@@ -100,18 +100,18 @@ func (g BindGroupLayoutEntry) toJS() any {
 		result["texture"] = g.Texture.toJS()
 	case g.StorageTexture != StorageTextureBindingLayout{}:
 		result["storageTexture"] = g.StorageTexture.toJS()
-	case !g.ExternalTexture.jsValue.(js.Value).IsUndefined():
+	case g.ExternalTexture.jsValue != nil:
 		result["externalTexture"] = g.ExternalTexture.toJS()
 	}
-	return result
+	return js.ValueOf(result)
 }
 
-func (g BindGroupLayoutDescriptor) toJS() any {
-	return map[string]any{
+func (g BindGroupLayoutDescriptor) toJS() js.Value {
+	return js.ValueOf(map[string]any{
 		"entries": mapSlice(g.Entries, func(entry BindGroupLayoutEntry) any {
 			return entry.toJS()
 		}),
-	}
+	})
 }
 
 var (

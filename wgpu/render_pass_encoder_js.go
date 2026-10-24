@@ -142,7 +142,7 @@ func (g *RenderPassEncoder) ExecuteBundles(bundles ...*RenderBundle) {
 // InsertDebugMarker as described:
 // https://gpuweb.github.io/gpuweb/#dom-gpudebugcommandsmixin-insertdebugmarker
 func (g *RenderPassEncoder) InsertDebugMarker(markerLabel string) {
-	g.jsValue.Call("insertDebugMarker", markerLabel)
+	g.jsValue.Call("insertDebugMarker", labelToJS(markerLabel))
 }
 
 // PopDebugGroup as described:
@@ -154,7 +154,7 @@ func (g *RenderPassEncoder) PopDebugGroup() {
 // PushDebugGroup as described:
 // https://gpuweb.github.io/gpuweb/#dom-gpudebugcommandsmixin-pushdebuggroup
 func (g *RenderPassEncoder) PushDebugGroup(groupLabel string) {
-	g.jsValue.Call("pushDebugGroup", groupLabel)
+	g.jsValue.Call("pushDebugGroup", labelToJS(groupLabel))
 }
 
 // TryEnd as described:

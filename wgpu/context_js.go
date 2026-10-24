@@ -18,8 +18,8 @@ type CanvasContext struct {
 	jsValue js.Value
 }
 
-func (g CanvasContext) toJS() any {
-	return g.jsValue
+func (g CanvasContext) toJS() js.Value {
+	return js.ValueOf(g.jsValue)
 }
 
 // TryGetCurrentTexture as described:

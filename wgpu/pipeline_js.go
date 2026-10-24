@@ -2,6 +2,8 @@
 
 package wgpu
 
+import "syscall/js"
+
 // PipelineLayoutDescriptor as described:
 // https://gpuweb.github.io/gpuweb/#dictdef-gpupipelinelayoutdescriptor
 type PipelineLayoutDescriptor struct {
@@ -9,12 +11,12 @@ type PipelineLayoutDescriptor struct {
 	BindGroupLayouts []*BindGroupLayout
 }
 
-func (g *PipelineLayoutDescriptor) toJS() any {
-	return map[string]any{
+func (g *PipelineLayoutDescriptor) toJS() js.Value {
+	return js.ValueOf(map[string]any{
 		"bindGroupLayouts": mapSlice(g.BindGroupLayouts, func(layout *BindGroupLayout) any {
 			return pointerToJS(layout)
 		}),
-	}
+	})
 }
 
 // VertexAttribute as described:
@@ -25,12 +27,12 @@ type VertexAttribute struct {
 	ShaderLocation uint32
 }
 
-func (g VertexAttribute) toJS() any {
-	return map[string]any{
+func (g VertexAttribute) toJS() js.Value {
+	return js.ValueOf(map[string]any{
 		"format":         enumToJS(g.Format),
 		"offset":         g.Offset,
 		"shaderLocation": g.ShaderLocation,
-	}
+	})
 }
 
 // VertexBufferLayout as described:
@@ -41,14 +43,14 @@ type VertexBufferLayout struct {
 	Attributes  []VertexAttribute
 }
 
-func (g VertexBufferLayout) toJS() any {
+func (g VertexBufferLayout) toJS() js.Value {
 	result := make(map[string]any)
 	result["arrayStride"] = g.ArrayStride
 	result["stepMode"] = enumToJS(g.StepMode)
 	result["attributes"] = mapSlice(g.Attributes, func(attrib VertexAttribute) any {
 		return attrib.toJS()
 	})
-	return result
+	return js.ValueOf(result)
 }
 
 // VertexState as described:
@@ -59,14 +61,14 @@ type VertexState struct {
 	Buffers    []VertexBufferLayout
 }
 
-func (g VertexState) toJS() any {
-	return map[string]any{
+func (g VertexState) toJS() js.Value {
+	return js.ValueOf(map[string]any{
 		"module":     pointerToJS(g.Module),
 		"entryPoint": g.EntryPoint,
 		"buffers": mapSlice(g.Buffers, func(layout VertexBufferLayout) any {
 			return layout.toJS()
 		}),
-	}
+	})
 }
 
 // PrimitiveState as described:
@@ -78,13 +80,13 @@ type PrimitiveState struct {
 	CullMode         CullMode
 }
 
-func (g PrimitiveState) toJS() any {
+func (g PrimitiveState) toJS() js.Value {
 	result := make(map[string]any)
 	result["topology"] = enumToJS(g.Topology)
 	result["stripIndexFormat"] = enumToJS(g.StripIndexFormat)
 	result["frontFace"] = enumToJS(g.FrontFace)
 	result["cullMode"] = enumToJS(g.CullMode)
-	return result
+	return js.ValueOf(result)
 }
 
 // StencilFaceState as described:
@@ -96,13 +98,13 @@ type StencilFaceState struct {
 	PassOp      StencilOperation
 }
 
-func (g StencilFaceState) toJS() any {
+func (g StencilFaceState) toJS() js.Value {
 	result := make(map[string]any)
 	result["compare"] = enumToJS(g.Compare)
 	result["failOp"] = enumToJS(g.FailOp)
 	result["depthFailOp"] = enumToJS(g.DepthFailOp)
 	result["passOp"] = enumToJS(g.PassOp)
-	return result
+	return js.ValueOf(result)
 }
 
 // DepthStencilState as described:
@@ -120,7 +122,7 @@ type DepthStencilState struct {
 	DepthBiasClamp      float32
 }
 
-func (g DepthStencilState) toJS() any {
+func (g DepthStencilState) toJS() js.Value {
 	result := make(map[string]any)
 	result["format"] = enumToJS(g.Format)
 	if g.DepthWriteEnabled == OptionalBoolTrue {
@@ -136,7 +138,7 @@ func (g DepthStencilState) toJS() any {
 	result["depthBias"] = g.DepthBias
 	result["depthBiasSlopeScale"] = g.DepthBiasSlopeScale
 	result["depthBiasClamp"] = g.DepthBiasClamp
-	return result
+	return js.ValueOf(result)
 }
 
 // MultisampleState as described:
@@ -147,12 +149,12 @@ type MultisampleState struct {
 	AlphaToCoverageEnabled bool
 }
 
-func (g MultisampleState) toJS() any {
+func (g MultisampleState) toJS() js.Value {
 	result := make(map[string]any)
 	result["count"] = g.Count
 	result["mask"] = g.Mask
 	result["alphaToCoverageEnabled"] = g.AlphaToCoverageEnabled
-	return result
+	return js.ValueOf(result)
 }
 
 // BlendComponent as described:
@@ -163,12 +165,12 @@ type BlendComponent struct {
 	DstFactor BlendFactor
 }
 
-func (g BlendComponent) toJS() any {
+func (g BlendComponent) toJS() js.Value {
 	result := make(map[string]any)
 	result["operation"] = enumToJS(g.Operation)
 	result["srcFactor"] = enumToJS(g.SrcFactor)
 	result["dstFactor"] = enumToJS(g.DstFactor)
-	return result
+	return js.ValueOf(result)
 }
 
 // BlendState as described:
@@ -178,11 +180,11 @@ type BlendState struct {
 	Alpha BlendComponent
 }
 
-func (g BlendState) toJS() any {
-	return map[string]any{
+func (g BlendState) toJS() js.Value {
+	return js.ValueOf(map[string]any{
 		"color": g.Color.toJS(),
 		"alpha": g.Alpha.toJS(),
-	}
+	})
 }
 
 // ColorTargetState as described:
@@ -193,12 +195,12 @@ type ColorTargetState struct {
 	WriteMask ColorWriteMask
 }
 
-func (g ColorTargetState) toJS() any {
+func (g ColorTargetState) toJS() js.Value {
 	result := make(map[string]any)
 	result["format"] = enumToJS(g.Format)
 	result["blend"] = pointerToJS(g.Blend)
 	result["writeMask"] = uint32(g.WriteMask)
-	return result
+	return js.ValueOf(result)
 }
 
 // FragmentState as described:
@@ -209,14 +211,14 @@ type FragmentState struct {
 	Targets    []ColorTargetState
 }
 
-func (g FragmentState) toJS() any {
-	return map[string]any{
+func (g FragmentState) toJS() js.Value {
+	return js.ValueOf(map[string]any{
 		"module":     pointerToJS(g.Module),
 		"entryPoint": g.EntryPoint,
 		"targets": mapSlice(g.Targets, func(target ColorTargetState) any {
 			return target.toJS()
 		}),
-	}
+	})
 }
 
 // RenderPipeline as described:

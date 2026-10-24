@@ -2,8 +2,10 @@
 
 package wgpu
 
-func (g *RenderBundleDescriptor) toJS() any {
-	return map[string]any{"label": g.Label}
+import "syscall/js"
+
+func (g *RenderBundleDescriptor) toJS() js.Value {
+	return js.ValueOf(map[string]any{"label": labelToJS(g.Label)})
 }
 
 // SetPipeline as described:
@@ -59,7 +61,7 @@ func (g *RenderBundleEncoder) DrawIndexedIndirect(indirectBuffer *Buffer, indire
 // InsertDebugMarker as described:
 // https://gpuweb.github.io/gpuweb/#dom-gpudebugcommandsmixin-insertdebugmarker
 func (g *RenderBundleEncoder) InsertDebugMarker(markerLabel string) {
-	g.jsValue.Call("insertDebugMarker", markerLabel)
+	g.jsValue.Call("insertDebugMarker", labelToJS(markerLabel))
 }
 
 // PopDebugGroup as described:
@@ -71,7 +73,7 @@ func (g *RenderBundleEncoder) PopDebugGroup() {
 // PushDebugGroup as described:
 // https://gpuweb.github.io/gpuweb/#dom-gpudebugcommandsmixin-pushdebuggroup
 func (g *RenderBundleEncoder) PushDebugGroup(groupLabel string) {
-	g.jsValue.Call("pushDebugGroup", groupLabel)
+	g.jsValue.Call("pushDebugGroup", labelToJS(groupLabel))
 }
 
 // Finish as described:
