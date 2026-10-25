@@ -102,6 +102,21 @@ func TestBufferMappedRangeWithOffset(t *testing.T) {
 	require.NoError(t, buffer.TryUnmap())
 }
 
+func TestBufferEmptyMappedRangeIsNil(t *testing.T) {
+	device, _ := newTestDevice(t)
+
+	buffer := device.CreateBuffer(&BufferDescriptor{
+		Size:             0,
+		Usage:            BufferUsageMapWrite | BufferUsageCopySrc,
+		MappedAtCreation: true,
+	})
+	defer buffer.Release()
+
+	// a non-nil slice would carry wgpu-core's dangling pointer (0x1)
+	require.Nil(t, buffer.GetMappedRange(0, WholeMapSize))
+	require.NoError(t, buffer.TryUnmap())
+}
+
 const doubleShader = `
 @group(0) @binding(0) var<storage, read_write> values: array<u32>;
 

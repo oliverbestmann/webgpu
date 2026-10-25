@@ -11,10 +11,6 @@ import (
 // #include "gen_wgpu_wrappers.h"
 import "C"
 
-import (
-	"unsafe"
-)
-
 var allocErrorCallbackValue = makeTypedPool[errorCallback]()
 
 type errorCallback struct {
@@ -92,8 +88,4 @@ func (v *errorCallback) ToError() error {
 		Context: context,
 		Wrapped: errors.New(message),
 	}
-}
-
-//export gowebgpu_error_callback_go
-func gowebgpu_error_callback_go(_type C.WGPUErrorType, message C.WGPUStringView, userdata unsafe.Pointer) {
 }
