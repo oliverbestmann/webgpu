@@ -4,11 +4,11 @@ go 1.25
 
 require (
 	github.com/go-gl/glfw/v3.4/glfw v0.1.0-pre.1.0.20260628091122-0bd588dc30cf
-	github.com/oliverbestmann/webgpu/libs-android v0.0.0-20260906104815-e05521a4bbbb
-	github.com/oliverbestmann/webgpu/libs-darwin v0.0.0-20260906104759-17c42a852178
-	github.com/oliverbestmann/webgpu/libs-ios v0.0.0-20261112094144-2425638651e5
-	github.com/oliverbestmann/webgpu/libs-linux v0.0.0-20260906104812-41e8774c38c4
-	github.com/oliverbestmann/webgpu/libs-windows v0.0.0-20260628152801-f47d1b682eb8
+	github.com/oliverbestmann/webgpu/libs-android v0.0.0-20261112101134-9fc0777bdf01
+	github.com/oliverbestmann/webgpu/libs-darwin v0.0.0-20261112101121-f12e930cb707
+	github.com/oliverbestmann/webgpu/libs-ios v0.0.0-20261112101124-0a18a0d4d894
+	github.com/oliverbestmann/webgpu/libs-linux v0.0.0-20261112101129-823eab7d2391
+	github.com/oliverbestmann/webgpu/libs-windows v0.0.0-20261112101126-37d06860ead9
 	github.com/stretchr/testify v1.11.1
 )
 
