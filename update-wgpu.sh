@@ -79,6 +79,33 @@ function push-libs-repository {
   done
 }
 
+# Since Go 1.27.4 and 1.26.11 (CVE-2026-97038), cgo refuses libraries with LLVM bitcode
+# sections, .drectve directives it can not verify, or objects without sections.
+# Rust puts all of these into the archive, none are needed to link it.
+function strip-for-go() {
+  local FILE="$1"
+  local TARGET="$2"
+
+  local ARGS=(
+    --remove-section=.llvmbc --remove-section=.llvmcmd
+    --remove-section=__LLVM,__bitcode --remove-section=__LLVM,__cmdline
+  )
+
+  if [[ "$TARGET" = windows ]] ; then
+    # only holds -exclude-symbols, which matters when exporting from a DLL
+    ARGS+=(--remove-section=.drectve)
+  fi
+
+  llvm-objcopy "${ARGS[@]}" "$FILE"
+
+  # empty split dwarf objects
+  local DWO
+  DWO=$(llvm-ar t "$FILE" | grep '\.dwo$' || true)
+  if [[ -n "$DWO" ]] ; then
+    llvm-ar d "$FILE" $DWO
+  fi
+}
+
 # copy files into target directories
 function copy-to-target() {
   local ZIP="$1"
@@ -98,6 +125,12 @@ function copy-to-target() {
   # copy lib to branch
   mkdir -p libs/repo/libs-"$TARGET"/"$ARCH"
   cp $ZIPS/zips/"$ZIP"/lib/"$LIB" libs/repo/libs-"$TARGET"/"$ARCH"
+
+  # shortcut: llvm-objcopy can not rewrite the MSVC libraries (windows arm64 and 386),
+  # so those still fail with Go 1.27.4. Fix them if someone builds for these targets.
+  if [[ "$LIB" = libwgpu_native.a ]] ; then
+    strip-for-go libs/repo/libs-"$TARGET"/"$ARCH"/"$LIB" "$TARGET"
+  fi
   git -C libs/repo add libs-"$TARGET"/"$ARCH"
 
   # commit the file if something has changed
@@ -115,6 +148,11 @@ webgpu.h linguist-vendored
 wgpu.h linguist-vendored
 EOF
 }
+
+if ! command -v llvm-objcopy >/dev/null ; then
+  echo "llvm-objcopy and llvm-ar are required, try: nix shell nixpkgs#llvm -c $0" >&2
+  exit 1
+fi
 
 download-and-extract
 
