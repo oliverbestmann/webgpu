@@ -40,6 +40,8 @@ github.com/oliverbestmann/webgpu/libs-windows v0.0.0-20260628152801-f47d1b682eb8
 github.com/oliverbestmann/webgpu/libs-windows v0.0.0-20260628152801-f47d1b682eb8/go.mod h1:58qRJHG2+mjEu/AKJFh026bz3xE1zEHYt41i4TBM8NE=
 github.com/oliverbestmann/webgpu/libs-windows v0.0.0-20261112101126-37d06860ead9 h1:cl6oW/81YkpRWDDrHMv7rh7rZBsEfHHqx/7nWP0owkA=
 github.com/oliverbestmann/webgpu/libs-windows v0.0.0-20261112101126-37d06860ead9/go.mod h1:58qRJHG2+mjEu/AKJFh026bz3xE1zEHYt41i4TBM8NE=
+github.com/oliverbestmann/webgpu/libs-windows v0.0.0-20261112110423-e4fd7225cf83 h1:tsUpbTqMTrQMWy0GkK3QBhwna6NAabKLyKd+dDyWu6Y=
+github.com/oliverbestmann/webgpu/libs-windows v0.0.0-20261112110423-e4fd7225cf83/go.mod h1:58qRJHG2+mjEu/AKJFh026bz3xE1zEHYt41i4TBM8NE=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=

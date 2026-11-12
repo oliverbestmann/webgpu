@@ -8,7 +8,7 @@ require (
 	github.com/oliverbestmann/webgpu/libs-darwin v0.0.0-20261112101121-f12e930cb707
 	github.com/oliverbestmann/webgpu/libs-ios v0.0.0-20261112101124-0a18a0d4d894
 	github.com/oliverbestmann/webgpu/libs-linux v0.0.0-20261112101129-823eab7d2391
-	github.com/oliverbestmann/webgpu/libs-windows v0.0.0-20261112101126-37d06860ead9
+	github.com/oliverbestmann/webgpu/libs-windows v0.0.0-20261112110423-e4fd7225cf83
 	github.com/stretchr/testify v1.11.1
 )
 
