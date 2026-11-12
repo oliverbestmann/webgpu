@@ -66,7 +66,8 @@ function fetch-libs-repository {
 
     for SYSTEM in $SYSTEMS ; do
       git -C repo fetch origin libs-"$SYSTEM"
-      git -C repo switch libs-"$SYSTEM"
+      # start from the remote branch, it may have commits from merged pull requests
+      git -C repo switch -C libs-"$SYSTEM" origin/libs-"$SYSTEM"
     done
   popd
 }
