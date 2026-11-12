@@ -30,6 +30,18 @@ apt install -y libegl1-mesa-dev mesa-vulkan-drivers \
     libxkbcommon-dev libwayland-dev
 ```
 
+### iOS simulator
+
+With `GOOS=ios`, the libraries are for iOS devices on arm64, and for the iOS simulator on amd64 (Intel Macs).
+To build for the iOS simulator on Apple silicon (arm64), add the `iossimulator` build tag, with the
+iOS simulator SDK, for example:
+```sh
+SDK=$(xcrun --sdk iphonesimulator --show-sdk-path)
+FLAGS="-isysroot $SDK -mios-simulator-version-min=13.0 -arch arm64"
+GOOS=ios GOARCH=arm64 CGO_ENABLED=1 CC="$(xcrun --sdk iphonesimulator -f clang)" \
+    CGO_CFLAGS="$FLAGS" CGO_LDFLAGS="$FLAGS" go build -tags iossimulator .
+```
+
 ## Error handling
 
 Error handling in this library is intentionally designed to use panics for most WebGPU-related validation errors. This

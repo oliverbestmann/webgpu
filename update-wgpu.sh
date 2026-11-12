@@ -30,11 +30,15 @@ function download-and-extract {
       pushd zips
 
         for ZIP in *.zip ; do
-          if [[ "$ZIP" = *-x86_64-msvc-* || "$ZIP" = *-aarch64-simulator-* ]] ; then
+          if [[ "$ZIP" = *-x86_64-msvc-* ]] ; then
             continue
           fi
 
           ARCH=$(cut -d- -f2-3 <<< "$ZIP")
+          if [[ "$ZIP" = *-aarch64-simulator-* ]] ; then
+            # the iOS simulator on Apple silicon, not the device (ios-aarch64)
+            ARCH="$ARCH-simulator"
+          fi
           mkdir "$ARCH"
           pushd "$ARCH"
             unzip ../"$ZIP"
@@ -119,6 +123,7 @@ copy-to-target "macos-aarch64"    "darwin"    "arm64"   libwgpu_native.a
 copy-to-target "macos-x86_64"     "darwin"    "amd64"   libwgpu_native.a
 copy-to-target "ios-aarch64"      "ios"       "arm64"   libwgpu_native.a
 copy-to-target "ios-x86_64"       "ios"       "amd64"   libwgpu_native.a
+copy-to-target "ios-aarch64-simulator" "ios" "arm64-simulator" libwgpu_native.a
 copy-to-target "windows-aarch64"  "windows"   "arm64"   wgpu_native.lib
 copy-to-target "windows-x86_64"   "windows"   "amd64"   libwgpu_native.a
 copy-to-target "windows-i686"     "windows"   "386"     wgpu_native.lib
