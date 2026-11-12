@@ -32,7 +32,8 @@ import (
 
 // iOS
 #cgo ios,amd64 CFLAGS: -I${SRCDIR}/lib/ios/amd64
-#cgo ios,arm64 CFLAGS: -I${SRCDIR}/lib/ios/arm64
+#cgo ios,arm64,!iossimulator CFLAGS: -I${SRCDIR}/lib/ios/arm64
+#cgo ios,arm64,iossimulator CFLAGS: -I${SRCDIR}/lib/ios/arm64-simulator
 
 // Darwin
 #cgo darwin,!ios,amd64 CFLAGS: -I${SRCDIR}/lib/darwin/amd64
