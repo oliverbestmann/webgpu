@@ -91,6 +91,24 @@ function strip-for-go() {
     --remove-section=__LLVM,__bitcode --remove-section=__LLVM,__cmdline
   )
 
+  if [[ "$FILE" = *.lib ]] ; then
+    # llvm-objcopy can not rewrite MSVC libraries because of their import members, so
+    # strip the objects one by one and replace them in place. Extracting everything would
+    # lose import members, many of them share a name.
+    local TMP
+    TMP=$(mktemp -d)
+    (
+      cd "$TMP"
+      llvm-ar x "$OLDPWD/$FILE" $(llvm-ar t "$OLDPWD/$FILE" | grep '\.o$')
+      for OBJ in *.o ; do
+        llvm-objcopy "${ARGS[@]}" "$OBJ"
+      done
+      llvm-ar r --format=coff "$OLDPWD/$FILE" *.o
+    )
+    rm -rf "$TMP"
+    return
+  fi
+
   if [[ "$TARGET" = windows ]] ; then
     # only holds -exclude-symbols, which matters when exporting from a DLL
     ARGS+=(--remove-section=.drectve)
@@ -125,12 +143,7 @@ function copy-to-target() {
   # copy lib to branch
   mkdir -p libs/repo/libs-"$TARGET"/"$ARCH"
   cp $ZIPS/zips/"$ZIP"/lib/"$LIB" libs/repo/libs-"$TARGET"/"$ARCH"
-
-  # shortcut: llvm-objcopy can not rewrite the MSVC libraries (windows arm64 and 386),
-  # so those still fail with Go 1.27.4. Fix them if someone builds for these targets.
-  if [[ "$LIB" = libwgpu_native.a ]] ; then
-    strip-for-go libs/repo/libs-"$TARGET"/"$ARCH"/"$LIB" "$TARGET"
-  fi
+  strip-for-go libs/repo/libs-"$TARGET"/"$ARCH"/"$LIB" "$TARGET"
   git -C libs/repo add libs-"$TARGET"/"$ARCH"
 
   # commit the file if something has changed
