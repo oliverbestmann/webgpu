@@ -9,6 +9,7 @@ Go bindings for WebGPU, a cross-platform, safe graphics API.
 
 It runs natively using [wgpu-native](https://github.com/gfx-rs/wgpu-native) on Vulkan, Metal, D3D12 and OpenGL ES. As
 there is still no cgo for wasm, wasm/web builds with `GOOS=js` are using the browser WebGPU interface directly.
+Native builds need cgo.
 
 This fork enhances the API by introducing garbage collection for types returned by WebGPU, preventing object leaks when
 `Release()` is not called, thus mirroring browser/JavaScript WebGPU behavior.
