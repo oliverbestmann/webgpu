@@ -405,38 +405,57 @@ func (g *Limits) toJS() map[string]any {
 	return result
 }
 
+// limitsFromJS reads the GPUSupportedLimits object. Limits the browser does not
+// report are returned as undefined, so that toJS does not request them.
 func limitsFromJS(j js.Value) Limits {
+	u32 := func(name string) uint32 {
+		v := j.Get(name)
+		if v.Type() != js.TypeNumber {
+			return LimitU32Undefined
+		}
+		return uint32(v.Int())
+	}
+	u64 := func(name string) uint64 {
+		v := j.Get(name)
+		if v.Type() != js.TypeNumber {
+			return LimitU64Undefined
+		}
+		return uint64(v.Float())
+	}
+
 	return Limits{
-		MaxTextureDimension1D:                     uint32(j.Get("maxTextureDimension1D").Int()),
-		MaxTextureDimension2D:                     uint32(j.Get("maxTextureDimension2D").Int()),
-		MaxTextureDimension3D:                     uint32(j.Get("maxTextureDimension3D").Int()),
-		MaxTextureArrayLayers:                     uint32(j.Get("maxTextureArrayLayers").Int()),
-		MaxBindGroups:                             uint32(j.Get("maxBindGroups").Int()),
-		MaxDynamicUniformBuffersPerPipelineLayout: uint32(j.Get("maxDynamicUniformBuffersPerPipelineLayout").Int()),
-		MaxDynamicStorageBuffersPerPipelineLayout: uint32(j.Get("maxDynamicStorageBuffersPerPipelineLayout").Int()),
-		MaxSampledTexturesPerShaderStage:          uint32(j.Get("maxSampledTexturesPerShaderStage").Int()),
-		MaxSamplersPerShaderStage:                 uint32(j.Get("maxSamplersPerShaderStage").Int()),
-		MaxStorageBuffersPerShaderStage:           uint32(j.Get("maxStorageBuffersPerShaderStage").Int()),
-		MaxStorageTexturesPerShaderStage:          uint32(j.Get("maxStorageTexturesPerShaderStage").Int()),
-		MaxUniformBuffersPerShaderStage:           uint32(j.Get("maxUniformBuffersPerShaderStage").Int()),
-		MaxUniformBufferBindingSize:               uint64(j.Get("maxUniformBufferBindingSize").Int()),
-		MaxStorageBufferBindingSize:               uint64(j.Get("maxStorageBufferBindingSize").Int()),
-		MinUniformBufferOffsetAlignment:           uint32(j.Get("minUniformBufferOffsetAlignment").Int()),
-		MinStorageBufferOffsetAlignment:           uint32(j.Get("minStorageBufferOffsetAlignment").Int()),
-		MaxVertexBuffers:                          uint32(j.Get("maxVertexBuffers").Int()),
-		MaxBufferSize:                             uint64(j.Get("maxBufferSize").Int()),
-		MaxVertexAttributes:                       uint32(j.Get("maxVertexAttributes").Int()),
-		MaxVertexBufferArrayStride:                uint32(j.Get("maxVertexBufferArrayStride").Int()),
-		// MaxInterStageShaderComponents:             uint32(j.Get("maxInterStageShaderComponents").Int()), // no present on firefox
-		MaxInterStageShaderVariables:      uint32(j.Get("maxInterStageShaderVariables").Int()),
-		MaxColorAttachments:               uint32(j.Get("maxColorAttachments").Int()),
-		MaxColorAttachmentBytesPerSample:  uint32(j.Get("maxColorAttachmentBytesPerSample").Int()),
-		MaxComputeWorkgroupStorageSize:    uint32(j.Get("maxComputeWorkgroupStorageSize").Int()),
-		MaxComputeInvocationsPerWorkgroup: uint32(j.Get("maxComputeInvocationsPerWorkgroup").Int()),
-		MaxComputeWorkgroupSizeX:          uint32(j.Get("maxComputeWorkgroupSizeX").Int()),
-		MaxComputeWorkgroupSizeY:          uint32(j.Get("maxComputeWorkgroupSizeY").Int()),
-		MaxComputeWorkgroupSizeZ:          uint32(j.Get("maxComputeWorkgroupSizeZ").Int()),
-		MaxComputeWorkgroupsPerDimension:  uint32(j.Get("maxComputeWorkgroupsPerDimension").Int()),
-		MaxImmediateSize:                  128,
+		// removed from the WebGPU spec, not reported by all browsers
+		MaxInterStageShaderComponents:             LimitU32Undefined,
+		MaxTextureDimension1D:                     u32("maxTextureDimension1D"),
+		MaxTextureDimension2D:                     u32("maxTextureDimension2D"),
+		MaxTextureDimension3D:                     u32("maxTextureDimension3D"),
+		MaxTextureArrayLayers:                     u32("maxTextureArrayLayers"),
+		MaxBindingsPerBindGroup:                   u32("maxBindingsPerBindGroup"),
+		MaxBindGroups:                             u32("maxBindGroups"),
+		MaxDynamicUniformBuffersPerPipelineLayout: u32("maxDynamicUniformBuffersPerPipelineLayout"),
+		MaxDynamicStorageBuffersPerPipelineLayout: u32("maxDynamicStorageBuffersPerPipelineLayout"),
+		MaxSampledTexturesPerShaderStage:          u32("maxSampledTexturesPerShaderStage"),
+		MaxSamplersPerShaderStage:                 u32("maxSamplersPerShaderStage"),
+		MaxStorageBuffersPerShaderStage:           u32("maxStorageBuffersPerShaderStage"),
+		MaxStorageTexturesPerShaderStage:          u32("maxStorageTexturesPerShaderStage"),
+		MaxUniformBuffersPerShaderStage:           u32("maxUniformBuffersPerShaderStage"),
+		MaxUniformBufferBindingSize:               u64("maxUniformBufferBindingSize"),
+		MaxStorageBufferBindingSize:               u64("maxStorageBufferBindingSize"),
+		MinUniformBufferOffsetAlignment:           u32("minUniformBufferOffsetAlignment"),
+		MinStorageBufferOffsetAlignment:           u32("minStorageBufferOffsetAlignment"),
+		MaxVertexBuffers:                          u32("maxVertexBuffers"),
+		MaxBufferSize:                             u64("maxBufferSize"),
+		MaxVertexAttributes:                       u32("maxVertexAttributes"),
+		MaxVertexBufferArrayStride:                u32("maxVertexBufferArrayStride"),
+		MaxInterStageShaderVariables:              u32("maxInterStageShaderVariables"),
+		MaxColorAttachments:                       u32("maxColorAttachments"),
+		MaxColorAttachmentBytesPerSample:          u32("maxColorAttachmentBytesPerSample"),
+		MaxComputeWorkgroupStorageSize:            u32("maxComputeWorkgroupStorageSize"),
+		MaxComputeInvocationsPerWorkgroup:         u32("maxComputeInvocationsPerWorkgroup"),
+		MaxComputeWorkgroupSizeX:                  u32("maxComputeWorkgroupSizeX"),
+		MaxComputeWorkgroupSizeY:                  u32("maxComputeWorkgroupSizeY"),
+		MaxComputeWorkgroupSizeZ:                  u32("maxComputeWorkgroupSizeZ"),
+		MaxComputeWorkgroupsPerDimension:          u32("maxComputeWorkgroupsPerDimension"),
+		MaxImmediateSize:                          u32("maxImmediateSize"),
 	}
 }
