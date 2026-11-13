@@ -11,6 +11,15 @@ It runs natively using [wgpu-native](https://github.com/gfx-rs/wgpu-native) on V
 there is still no cgo for wasm, wasm/web builds with `GOOS=js` are using the browser WebGPU interface directly.
 Native builds need cgo.
 
+In the browser, `Queue.WriteBuffer` and `Queue.WriteTexture` copy the data into a JavaScript array first. To avoid
+that copy, expose the instantiated module as a global `wasm` variable before calling `go.run`:
+
+```js
+let wasm;
+wasm = await WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject);
+go.run(wasm.instance);
+```
+
 This fork enhances the API by introducing garbage collection for types returned by WebGPU, preventing object leaks when
 `Release()` is not called, thus mirroring browser/JavaScript WebGPU behavior.
 

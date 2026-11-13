@@ -2,8 +2,6 @@
 
 package wgpu
 
-import "syscall/js"
-
 // GoScript compiles Go to JavaScript, so there is no wasm memory to view;
 // the data is copied into a JavaScript Uint8Array instead.
 
@@ -29,11 +27,4 @@ func (g *Queue) TryWriteTexture(destination *TexelCopyTextureInfo, data []byte, 
 	defer handleJsException(&err)
 	g.jsValue.Call("writeTexture", pointerToJS(destination), bytesToJS(data), pointerToJS(dataLayout), pointerToJS(writeSize))
 	return
-}
-
-// bytesToJS copies the given bytes into a new JavaScript Uint8Array.
-func bytesToJS(data []byte) js.Value {
-	array := js.Global().Get("Uint8Array").New(len(data))
-	js.CopyBytesToJS(array, data)
-	return array
 }

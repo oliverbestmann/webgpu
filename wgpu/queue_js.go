@@ -2,7 +2,11 @@
 
 package wgpu
 
-import "github.com/oliverbestmann/webgpu/jsx"
+import (
+	"syscall/js"
+
+	"github.com/oliverbestmann/webgpu/jsx"
+)
 
 // Submit as described:
 // https://gpuweb.github.io/gpuweb/#dom-gpuqueue-submit
@@ -23,4 +27,11 @@ func (g *Queue) OnSubmittedWorkDone(callback QueueWorkDoneCallback) {
 // nanoseconds, so no conversion is needed.
 func (g *Queue) GetTimestampPeriod() float32 {
 	return 1
+}
+
+// bytesToJS copies the given bytes into a new JavaScript Uint8Array.
+func bytesToJS(data []byte) js.Value {
+	array := js.Global().Get("Uint8Array").New(len(data))
+	js.CopyBytesToJS(array, data)
+	return array
 }
