@@ -3,7 +3,7 @@
 
 # WebGPU
 
-Current upstream version: v29.0.0.0
+Current upstream version: v29.0.1.1
 
 Go bindings for WebGPU, a cross-platform, safe graphics API.
 
