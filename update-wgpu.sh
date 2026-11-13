@@ -197,5 +197,7 @@ done
 # re-generate enums & bindings
 go generate ./wgpu
 
-git add go.mod go.sum wgpu/lib/
+sed -i "s/^Current upstream version: .*/Current upstream version: $VERSION/" README.md
+
+git add go.mod go.sum wgpu/lib/ README.md
 git commit -m "chore: update wgpu to $VERSION"
